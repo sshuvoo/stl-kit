@@ -1,0 +1,46 @@
+{
+  "name": "stl",
+  "version": "1.0.0",
+  "description": "A modern JavaScript library providing efficient and reusable implementations of common data structures and algorithms. Designed to simplify development by offering ready-to-use collections like lists, stacks, queues, dequeues and more—with clean, consistent APIs and zero boilerplate.",
+  "keywords": [
+    "standard template library",
+    "stl",
+    "data structures",
+    "algorithms",
+    "collections",
+    "stack",
+    "queue",
+    "list",
+    "linkedlist",
+    "tree",
+    "binary tree",
+    "typescript",
+    "javascript",
+    "library",
+    "utility",
+    "generic",
+    "package"
+  ],
+  "homepage": "https://github.com/sshuvoo/javascript-stl#readme",
+  "bugs": {
+    "url": "https://github.com/sshuvoo/javascript-stl/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/sshuvoo/javascript-stl.git"
+  },
+  "license": "MIT",
+  "author": "Saffaullah Shuvo",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "dev": "tsc -w",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "prettier": "3.6.1",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
