@@ -180,13 +180,11 @@ list.forEach((value, index) => {
 
 ---
 
-#### `[Symbol.iterator](): Iterator<T>`
-
-Make the list iterable (for...of).
+#### `Iteration: Iterator<T>`
 
 ```ts
 for (const value of list) {
-  console.log(value)
+  // ...
 }
 ```
 
@@ -255,37 +253,6 @@ list.back = 200 // [100, 2, 200]
 | `length`                     | Number of elements in the list.                                    | `list.length`                |
 | `front` (getter/setter)      | Get or set the front value.                                        | `list.front = 100`           |
 | `back` (getter/setter)       | Get or set the back value.                                         | `list.back = 200`            |
-
-#### Advanced Usage
-
-##### Assigning Values
-
-```ts
-const list = new LinkedList<number>()
-list.assign(5, 42) // [42, 42, 42, 42, 42]
-list.assign([1, 2, 3, 4], 1, 2) // [2, 3]
-```
-
-##### Indexed Insertion/Erasure
-
-```ts
-list.insertAt(99, 1) // Insert 99 at index 1
-list.eraseAt(0) // Remove first element
-```
-
-##### Iteration
-
-```ts
-for (const value of list) {
-  // ...
-}
-
-list.forEach((value, index) => {
-  if (value === 42) return false // break early
-})
-```
-
----
 
 ## Contributing
 
