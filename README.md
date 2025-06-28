@@ -1,6 +1,6 @@
 # Standard Template Library - JavaScript
 
-A modern JavaScript library providing efficient and reusable implementations of common data structures and algorithms. Designed to simplify development by offering ready-to-use collections like lists, stacks, queues, deques, and more—with clean, consistent APIs and zero boilerplate.
+A modern JavaScript library providing efficient and reusable implementations of common data structures and algorithms. Designed to simplify development by offering ready-to-use collections like linked lists, stacks, queues, deques, and more—with clean, consistent APIs and zero boilerplate.
 
 ---
 
@@ -13,7 +13,6 @@ A modern JavaScript library providing efficient and reusable implementations of 
     - [Overview](#overview)
     - [Basic Example](#basic-example)
     - [API Reference](#api-reference)
-    - [Advanced Usage](#advanced-usage)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -22,7 +21,12 @@ A modern JavaScript library providing efficient and reusable implementations of 
 ## Installation
 
 ```sh
-npm install stl
+# Using npm
+npm install stl-kit
+# Using yarn
+yarn add stl-kit
+# Using pnpm
+pnpm add stl-kit
 ```
 
 ---
@@ -32,7 +36,10 @@ npm install stl
 Import the desired data structure:
 
 ```ts
-import { LinkedList } from 'stl'
+// Using ES6 import
+import { LinkedList } from 'stl-kit'
+// Using CommonJS require
+const { LinkedList } = require('stl-kit')
 ```
 
 ---
@@ -180,6 +187,17 @@ list.forEach((value, index) => {
 
 ---
 
+#### `.reverse(): void`
+
+Reverse the list connection.
+
+```ts
+// list [1, 2, 3]
+list.reverse() // [3, 2, 1]
+```
+
+---
+
 #### `Iteration: Iterator<T>`
 
 ```ts
@@ -235,24 +253,27 @@ list.back = 200 // [100, 2, 200]
 
 #### API Reference
 
-| Method / Property            | Description                                                        | Example Usage                |
-| ---------------------------- | ------------------------------------------------------------------ | ---------------------------- |
-| `constructor(values?)`       | Create a new list, optionally initialized with an array of values. | `new LinkedList([1,2,3])`    |
-| `pushFront(value)`           | Insert value at the front.                                         | `list.pushFront(5)`          |
-| `pushBack(value)`            | Insert value at the back.                                          | `list.pushBack(10)`          |
-| `popFront()`                 | Remove and return the front value.                                 | `list.popFront()`            |
-| `popBack()`                  | Remove and return the back value.                                  | `list.popBack()`             |
-| `insertAt(value, index)`     | Insert value at a specific index.                                  | `list.insertAt(42, 1)`       |
-| `eraseAt(index)`             | Remove and return value at a specific index.                       | `list.eraseAt(0)`            |
-| `assign(count, value)`       | Fill the list with `count` copies of `value`.                      | `list.assign(3, 7)`          |
-| `assign(values, start, end)` | Fill the list with a slice of an array.                            | `list.assign([1,2,3], 0, 1)` |
-| `clear()`                    | Remove all elements.                                               | `list.clear()`               |
-| `isEmpty()`                  | Returns `true` if the list is empty.                               | `list.isEmpty()`             |
-| `forEach(callback)`          | Iterate with a callback. Return `false` to break early.            | `list.forEach((v,i)=>{})`    |
-| `[Symbol.iterator]()`        | Make the list iterable (for...of).                                 | `for (const v of list) {}`   |
-| `length`                     | Number of elements in the list.                                    | `list.length`                |
-| `front` (getter/setter)      | Get or set the front value.                                        | `list.front = 100`           |
-| `back` (getter/setter)       | Get or set the back value.                                         | `list.back = 200`            |
+#### API Reference
+
+| Method / Property            | Description                                                                                |
+| ---------------------------- | ------------------------------------------------------------------------------------------ |
+| `constructor(values?)`       | Create a new list, optionally initialized with an array of values.<br>T.C: O(n), S.C: O(n) |
+| `pushFront(value)`           | Insert value at the front.<br>T.C: O(1), S.C: O(1)                                         |
+| `pushBack(value)`            | Insert value at the back.<br>T.C: O(1), S.C: O(1)                                          |
+| `popFront()`                 | Remove and return the front value.<br>T.C: O(1), S.C: O(1)                                 |
+| `popBack()`                  | Remove and return the back value.<br>T.C: O(1), S.C: O(1)                                  |
+| `insertAt(value, index)`     | Insert value at a specific index.<br>T.C: O(n), S.C: O(1)                                  |
+| `eraseAt(index)`             | Remove and return value at a specific index.<br>T.C: O(n), S.C: O(1)                       |
+| `assign(count, value)`       | Fill the list with `count` copies of `value`.<br>T.C: O(n), S.C: O(n)                      |
+| `assign(values, start, end)` | Fill the list with a slice of an array.<br>T.C: O(n), S.C: O(n)                            |
+| `clear()`                    | Remove all elements.<br>T.C: O(n), S.C: O(1)                                               |
+| `isEmpty()`                  | Returns `true` if the list is empty.<br>T.C: O(1), S.C: O(1)                               |
+| `forEach(callback)`          | Iterate with a callback. Return `false` to break early.<br>T.C: O(n), S.C: O(1)            |
+| `reverse()`                  | Reverse the current list.<br>T.C: O(n), S.C: O(1)                                          |
+| `[Symbol.iterator]()`        | Make the list iterable (for...of).<br>T.C: O(1), S.C: O(1)                                 |
+| `length`                     | Number of elements in the list.<br>T.C: O(1), S.C: O(1)                                    |
+| `front` (getter/setter)      | Get or set the front value.<br>T.C: O(1), S.C: O(1)                                        |
+| `back` (getter/setter)       | Get or set the back value.<br>T.C: O(1), S.C: O(1)                                         |
 
 ## Contributing
 

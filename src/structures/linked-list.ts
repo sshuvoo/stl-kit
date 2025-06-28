@@ -1,4 +1,4 @@
-import { ListNode } from './../core/list-node.js'
+import { ListNode } from '@/core/list-node'
 
 export class LinkedList<T> {
   #head: ListNode<T> | null
@@ -13,19 +13,26 @@ export class LinkedList<T> {
 
   public reverse(): void {
     if (this.length <= 1) return
+
     let prev: ListNode<T> | null = null
-    let curr: ListNode<T> | null = this.#tail
+    let curr: ListNode<T> | null = this.#head
     let next: ListNode<T> | null = null
 
     while (curr != null) {
       next = curr.next
 
+      // Swap next and prev pointers
       curr.next = prev
       curr.prev = next
 
+      // Move forward
       prev = curr
       curr = next
     }
+
+    // Swap head and tail
+    this.#tail = this.#head
+    this.#head = prev
   }
 
   // Overload signatures

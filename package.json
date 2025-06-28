@@ -1,13 +1,34 @@
 {
-  "name": "stl",
+  "name": "stl-kit",
   "version": "1.0.0",
   "description": "A modern JavaScript library providing efficient and reusable implementations of common data structures and algorithms. Designed to simplify development by offering ready-to-use collections like lists, stacks, queues, dequeues and more—with clean, consistent APIs and zero boilerplate.",
   "keywords": [
+    "standard-template-library",
     "stl",
+    "stl-kit",
+    "data-structures",
+    "algorithms",
+    "list",
+    "array",
+    "arraylist",
+    "vector",
+    "set",
+    "map",
+    "hashmap",
+    "hashset",
+    "hash-table",
     "linkedlist",
     "stack",
     "queue",
-    "dequeue"
+    "dequeue",
+    "tree",
+    "binary-tree",
+    "heap",
+    "priority-queue",
+    "graph",
+    "collections",
+    "javascript",
+    "typescript"
   ],
   "homepage": "https://github.com/sshuvoo/javascript-stl#readme",
   "bugs": {
@@ -29,11 +50,14 @@
     "lib/"
   ],
   "scripts": {
-    "start": "tsc -w",
+    "start": "tsup --watch",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
     "test": "vitest"
   },
   "devDependencies": {
     "prettier": "3.6.1",
+    "tsup": "^8.5.0",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   }
