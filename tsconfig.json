@@ -6,7 +6,10 @@
     "module": "esnext",
     "rootDir": "./src",
     "moduleResolution": "node",
-    "baseUrl": "./",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
@@ -31,5 +34,6 @@
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/__test__"]
 }
