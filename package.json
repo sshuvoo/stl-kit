@@ -1,6 +1,6 @@
 {
   "name": "stl-kit",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A modern JavaScript library providing efficient and reusable implementations of common data structures and algorithms. Designed to simplify development by offering ready-to-use collections like lists, stacks, queues, dequeues and more—with clean, consistent APIs and zero boilerplate.",
   "keywords": [
     "standard-template-library",
