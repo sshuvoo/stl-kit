@@ -6,7 +6,7 @@ A classic stack (LIFO) data structure implementation for JavaScript/TypeScript, 
 
 ## Constructor
 
-### `new Stack<T, A extends unknown[] = unknown[]>(values?: T[], TypeCtor?: Constructor<T, A>)`
+### `new Stack(values?: T[], TypeCtor?: Constructor<T, A>)`
 
 Create a new stack, optionally initialized with an array of values. Optionally provide a constructor for emplace.
 
@@ -112,12 +112,13 @@ console.log(stack.length) // 3
 
 ---
 
-### `Stack.equals(stack1, stack2): boolean` (static)
+### `Stack.equals(stack1, stack2, comparator?): boolean` (static)
 
-Check if two stacks are equal (element-wise).
+Check if two stacks are equal (element-wise). Optionally, provide a custom comparator function.
 
 ```ts
-Stack.equals(stack1, stack2) // true or false
+Stack.equals(stack1, stack2) // true or false (uses === by default)
+Stack.equals(stack1, stack2, (a, b) => a.id === b.id) // custom comparison
 ```
 
 ---
@@ -134,19 +135,19 @@ Stack.swap(stack1, stack2)
 
 ## API Reference
 
-| Method / Property                | Description                                                                                       |
-| -------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `constructor(values, TypeCtor?)` | Create a new stack, optionally initialized with values and a constructor.<br>T.C: O(n), S.C: O(n) |
-| `push(value)`                    | Push value onto the stack.<br>T.C: O(1), S.C: O(1)                                                |
-| `pop()`                          | Remove and return the top value.<br>T.C: O(1), S.C: O(1)                                          |
-| `emplace(...args)`               | Construct and push a value using the provided constructor.<br>T.C: O(1), S.C: O(1)                |
-| `clear()`                        | Remove all elements.<br>T.C: O(n), S.C: O(1)                                                      |
-| `isEmpty()`                      | Returns `true` if the stack is empty.<br>T.C: O(1), S.C: O(1)                                     |
-| `top` (getter/setter)            | Get or set the top value.<br>T.C: O(1), S.C: O(1)                                                 |
-| `[Symbol.iterator]()`            | Iterate from top to bottom.<br>T.C: O(1), S.C: O(1)                                               |
-| `length`                         | Number of elements in the stack.<br>T.C: O(1), S.C: O(1)                                          |
-| `Stack.equals(a, b)`             | Check if two stacks are equal.<br>T.C: O(n), S.C: O(1)                                            |
-| `Stack.swap(a, b)`               | Swap the contents of two stacks.<br>T.C: O(1), S.C: O(1)                                          |
+| Method / Property                 | Description                                                                                       |
+| --------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `constructor(values, TypeCtor?)`  | Create a new stack, optionally initialized with values and a constructor.<br>T.C: O(n), S.C: O(n) |
+| `push(value)`                     | Push value onto the stack.<br>T.C: O(1), S.C: O(1)                                                |
+| `pop()`                           | Remove and return the top value.<br>T.C: O(1), S.C: O(1)                                          |
+| `emplace(...args)`                | Construct and push a value using the provided constructor.<br>T.C: O(1), S.C: O(1)                |
+| `clear()`                         | Remove all elements.<br>T.C: O(n), S.C: O(1)                                                      |
+| `isEmpty()`                       | Returns `true` if the stack is empty.<br>T.C: O(1), S.C: O(1)                                     |
+| `top` (getter/setter)             | Get or set the top value.<br>T.C: O(1), S.C: O(1)                                                 |
+| `[Symbol.iterator]()`             | Iterate from top to bottom.<br>T.C: O(1), S.C: O(1)                                               |
+| `length`                          | Number of elements in the stack.<br>T.C: O(1), S.C: O(1)                                          |
+| `Stack.equals(a, b, comparator?)` | Check if two stacks are equal. Optionally provide a comparator.<br>T.C: O(n), S.C: O(1)           |
+| `Stack.swap(a, b)`                | Swap the contents of two stacks.<br>T.C: O(1), S.C: O(1)                                          |
 
 ---
 
