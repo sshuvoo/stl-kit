@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [4.1.0] - 2025-07-02
+
+### Added
+
+- New methods added to `LinkedList`
+
+### Fixed
+
+- Bug fixes in `LinkedList` implementation
+
+### Changed
+
+- Updated documentation: `docs/linked-list.md` with new methods and improvements
+
+---
+
 ## [4.0.0] - 2025-07-01
 
 ### Added

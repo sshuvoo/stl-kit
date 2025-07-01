@@ -211,24 +211,28 @@ dq2.toArray() // [1, 2]
 ## API Reference
 
 | Method / Property       | Description                                                               | Signature                                                                      |
-| ----------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------- |
+| ----------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `constructor(options?)` | Create a new deque, optionally with initial values and a factory.         | `new Deque<T, A>(options?: { initValues?: T[], factory?: (...args: A) => T })` |
 | `pushFront(value)`      | Insert value at the front.                                                | `pushFront(value: T): void`                                                    |
 | `pushBack(value)`       | Insert value at the back.                                                 | `pushBack(value: T): void`                                                     |
-| `popFront()`            | Remove and return value from the front.                                   | `popFront(): T                                                                 | undefined`                 |
-| `popBack()`             | Remove and return value from the back.                                    | `popBack(): T                                                                  | undefined`                 |
+| `popFront()`            | Remove and return value from the front.                                   | `popFront(): T \| undefined`                                                   |
+| `popBack()`             | Remove and return value from the back.                                    | `popBack(): T \| undefined`                                                    |
 | `emplaceFront(...args)` | Construct and insert value at the front using factory or arguments.       | `emplaceFront(...args: A): void`                                               |
 | `emplaceBack(...args)`  | Construct and insert value at the back using factory or arguments.        | `emplaceBack(...args: A): void`                                                |
 | `isEmpty()`             | Check if the deque is empty.                                              | `isEmpty(): boolean`                                                           |
 | `clear()`               | Remove all elements.                                                      | `clear(): void`                                                                |
 | `assign(count, value)`  | Fill deque with `count` copies of `value`.                                | `assign(count: number, value: T): void`                                        |
 | `assign(values, s, e)`  | Fill deque with a slice of `values` from `s` to `e` (exclusive).          | `assign(values: T[], start?: number, end?: number): void`                      |
-| `forEach(cb, thisArg?)` | Iterate and call `cb` for each value. Breaks if callback returns `false`. | `forEach(callback: (value, index, deque) => void                               | false, thisArg?): void`    |
+| `forEach(cb, thisArg?)` | Iterate and call `cb` for each value. Breaks if callback returns `false`. | `forEach(callback: (value, index, deque) => void \| false, thisArg?): void`    |
 | `toArray()`             | Convert deque to array.                                                   | `toArray(): T[]`                                                               |
-| `at(index)`             | Get value at index (0-based).                                             | `at(index: number): T                                                          | undefined`                 |
+| `at(index)`             | Get value at index (0-based).                                             | `at(index: number): T \| undefined`                                            |
 | `begin()`               | Get forward iterator.                                                     | `begin(): IterableIterator<T>`                                                 |
 | `rbegin()`              | Get reverse iterator.                                                     | `rbegin(): IterableIterator<T>`                                                |
 | `length`                | Number of elements.                                                       | `length: number`                                                               |
-| `front`                 | Get/set value at the front.                                               | `front: T                                                                      | undefined` (getter/setter) |
-| `back`                  | Get/set value at the back.                                                | `back: T                                                                       | undefined` (getter/setter) |
+| `front`                 | Get/set value at the front.                                               | `front: T \| undefined` (getter/setter)                                        |
+| `back`                  | Get/set value at the back.                                                | `back: T \| undefined` (getter/setter)                                         |
 | `swap(q1, q2)`          | Static: Swap contents of two deques.                                      | `Deque.swap<U, V>(q1: Deque<U, V>, q2: Deque<U, V>): void`                     |
+
+---
+
+<sub>If you found any bug, please create an issue to help make this library more reliable and efficient. Your feedback is highly appreciated!</sub>

@@ -5,6 +5,8 @@ export class ListNode<T> {
     public next: ListNode<T> | null = null,
   ) {}
   public cleanup() {
-    this.prev = this.next = this.val = null as any
+    this.prev = null
+    this.next = null
+    this.val = null as T
   }
 }
