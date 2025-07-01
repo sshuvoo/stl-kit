@@ -59,6 +59,7 @@ Full documentation for each data structure and API is available in the [docs/](.
 - [LinkedList Documentation](./docs/linked-list.md)
 - [Stack Documentation](./docs/stack.md)
 - [Queue Documentation](./docs/queue.md)
+- [Deque Documentation](./docs/deque.md)
 
 Each file contains detailed usage, API reference, and examples for the respective data structure.
 
@@ -77,8 +78,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Coming Soon
 
-- Queue
-- Deque
 - More algorithms and utilities!
 
 ---

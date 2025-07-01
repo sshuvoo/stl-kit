@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [4.0.0] - 2025-07-01
+
+### Added
+
+- Data Structure: `Deque`
+- Documentation: `docs/deque.md` for detailed API docs
+
 ## [3.0.0] - 2025-06-30
 
 ### Added
