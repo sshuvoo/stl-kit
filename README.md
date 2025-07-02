@@ -54,12 +54,13 @@ const { LinkedList } = require('stl-kit')
 
 ## Documentation
 
-Full documentation for each data structure and API is available in the [docs/](./docs/) folder:
+Full documentation for each data structure and API is available below:
 
 - [LinkedList Documentation](./docs/linked-list.md)
 - [Stack Documentation](./docs/stack.md)
 - [Queue Documentation](./docs/queue.md)
 - [Deque Documentation](./docs/deque.md)
+- [Vector Documentation](./docs/vector.md)
 
 Each file contains detailed usage, API reference, and examples for the respective data structure.
 

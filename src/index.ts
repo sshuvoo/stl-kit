@@ -7,3 +7,5 @@ export * from '@/structures/queue'
 export * from '@/structures/deque'
 
 export * from '@/core/list-node'
+
+export * from '@/structures/vector'

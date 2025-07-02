@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [5.0.0] - 2025-07-03
+
+### Added
+
+- Data Structure: `Vector`
+- Documentation: `docs/vector.md` for detailed API docs
+
 ## [4.1.0] - 2025-07-02
 
 ### Added
