@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [5.1.1] - 2025-07-03
+
+### Changed
+
+- Updated `README.md` with SEO improvements
+- Updated `package.json` to fix CommonJS/ESM entry configuration
+
+---
+
 ## [5.1.0] - 2025-07-03
 
 ### Added

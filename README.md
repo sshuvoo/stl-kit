@@ -1,4 +1,4 @@
-# Standard Template Library - JavaScript
+# A TypeScript-First Standard Template Library (STL) for Data Structures & Algorithms
 
 <p align="center">
   <a href="https://github.com/sshuvoo/javascript-stl/blob/master/LICENSE">
@@ -12,7 +12,7 @@
   </a>
 </p>
 
-A modern JavaScript library providing efficient and reusable implementations of common data structures and algorithms. Designed to simplify development by offering ready-to-use collections like linked lists, stacks, queues, deques, and more—with clean, consistent APIs and zero boilerplate.
+A modern JavaScript & TypeScript standard template library (STL) for data structures and algorithms. Includes high-performance implementations of Stack, Queue, Deque, Linked List, Vector, Set, Map, Tree, Heap, and Graph — inspired by C++ STL. Designed for performance, reusability, and clean, type-safe APIs.
 
 ---
 
