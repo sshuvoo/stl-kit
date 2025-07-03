@@ -1,131 +1,194 @@
 # Stack
 
-A classic stack (LIFO) data structure implementation for JavaScript/TypeScript, supporting efficient push and pop operations, iteration, and advanced features like emplace and static utilities. Generic and type-safe for all types.
+A classic, robust and developer-friendly **Stack** (LIFO) data structure implemented in TypeScript using a **doubly linked list** internally. Designed for flexibility, extensibility, and performance with support for `emplace`, `clone`, STL-style iterators, and more.
 
 ---
 
-## Constructor
-
-### `new Stack(values?: T[], TypeCtor?: Constructor<T, A>)`
-
-Create a new stack, optionally initialized with an array of values. Optionally provide a constructor for emplace.
+## 🚀 Quick Start
 
 ```ts
-const stack = new Stack<number>() // Empty stack
-const stack2 = new Stack(['a', 'b', 'c']) // ['a', 'b', 'c'] (top is 'c')
+import { Stack } from 'stl-kit'
+
+const stack = new Stack<number>()
+stack.push(10)
+stack.push(20)
+console.log(stack.pop()) // 20
 ```
 
 ---
 
-## Methods & Properties
-
-### `.push(value: T): void`
-
-Push a value onto the stack.
+## 🏗️ Constructor
 
 ```ts
-stack.push(10) // [10]
+new Stack<T, A>(options?: {
+  initValues?: T[]
+  factory?: (...args: A) => T
+})
+```
+
+- `initValues`: Optional array of values to prefill the stack.
+- `factory`: Optional factory for use with `emplace()`.
+
+---
+
+## 📚 Instance Methods
+
+### `push(value: T): void`
+
+Adds a value to the top of the stack.
+
+```ts
+stack.push(42)
 ```
 
 ---
 
-### `.pop(): T | undefined`
+### `pop(): T | undefined`
 
-Remove and return the top value.
+Removes and returns the top value. Returns `undefined` if empty.
 
 ```ts
-const last = stack.pop() // 10, stack is now []
+const val = stack.pop()
 ```
 
 ---
 
-### `.emplace(...args: A): void`
+### `peek(): T | undefined`
 
-Construct and push a value using the provided constructor and arguments.
+Returns the top value without removing it.
 
 ```ts
-class Point {
-  constructor(
-    public x: number,
-    public y: number,
-  ) {}
-}
-const stack = new Stack<Point, [number, number]>([], Point)
-// Or even shorter
-const stack = new Stack([], Point)
-
-stack.emplace(1, 2) // stack.top is Point { x: 1, y: 2 }
+stack.peek()
 ```
 
 ---
 
-### `.clear(): void`
+### `emplace(...args: A): void`
 
-Remove all elements from the stack.
+Constructs and pushes a value using the provided factory.
 
 ```ts
-stack.clear() // []
+const stack = new Stack<Person, [string, number]>({
+  factory: (name, age) => new Person(name, age),
+})
+stack.emplace('Alice', 30)
 ```
 
 ---
 
-### `.isEmpty(): boolean`
+### `assign(count: number, value: T): void`
 
-Returns `true` if the stack is empty.
+Fills the stack with `count` copies of `value`.
 
 ```ts
-stack.isEmpty() // true
+stack.assign(3, 99) // [99, 99, 99]
 ```
 
 ---
 
-### `.top: T | undefined` (getter/setter)
+### `assign(values: T[], start?: number, end?: number): void`
 
-Get or set the top value.
+Fills the stack with a slice of `values`.
 
 ```ts
-console.log(stack.top) // 10
-stack.top = 20 // replaces top value with 20
+stack.assign([1, 2, 3, 4], 1, 3) // [2, 3]
 ```
 
 ---
 
-### `Iteration: IterableIterator<T>`
+### `clone(deepCloneFn?: (val: T) => T): Stack<T, A>`
 
-Iterate from top to bottom.
+Returns a deep copy of the stack. Defaults to `structuredClone`.
 
 ```ts
-for (const value of stack) {
-  // ...
-}
+const deep = stack.clone()
+const shallow = stack.clone((v) => v)
 ```
 
 ---
 
-### `.length: number`
+### `clear(): void`
 
-Number of elements in the stack.
+Removes all elements.
 
 ```ts
-console.log(stack.length) // 3
+stack.clear()
 ```
 
 ---
 
-### `Stack.equals(stack1, stack2, comparator?): boolean` (static)
+### `toArray(): T[]`
 
-Check if two stacks are equal (element-wise). Optionally, provide a custom comparator function.
+Returns a shallow copy of the stack as an array.
 
 ```ts
-Stack.equals(stack1, stack2) // true or false (uses === by default)
-Stack.equals(stack1, stack2, (a, b) => a.id === b.id) // custom comparison
+const arr = stack.toArray()
 ```
 
 ---
 
-### `Stack.swap(stack1, stack2): void` (static)
+### `forEach(cb, thisArg?)`
 
-Swap the contents of two stacks.
+Iterates through the stack from bottom to top.
+
+```ts
+stack.forEach((val, i) => console.log(val, i))
+```
+
+---
+
+### `begin(): IterableIterator<T>`
+
+Returns a forward iterator (default direction).
+
+```ts
+for (const val of stack.begin()) { ... }
+```
+
+---
+
+### `rbegin(): IterableIterator<T>`
+
+Returns a reverse iterator (from top to bottom).
+
+```ts
+for (const val of stack.rbegin()) { ... }
+```
+
+---
+
+## 🧾 Properties
+
+### `length: number`
+
+Current number of elements in the stack.
+
+### `top: T | undefined`
+
+Getter/setter for the top value.
+
+```ts
+stack.top = 99
+const val = stack.top
+```
+
+---
+
+## 🧰 Static Methods
+
+### `Stack.equals(stack1, stack2, comparator?): boolean`
+
+Checks equality of two stacks. Optionally pass a comparator.
+
+```ts
+Stack.equals(stackA, stackB)
+```
+
+---
+
+### `Stack.swap(stack1, stack2): void`
+
+Swaps contents of two stacks (must use same factory).
 
 ```ts
 Stack.swap(stack1, stack2)
@@ -133,40 +196,55 @@ Stack.swap(stack1, stack2)
 
 ---
 
-## API Reference
+## ⚠️ Error Handling
 
-| Method / Property                 | Description                                                                                       |
-| --------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `constructor(values, TypeCtor?)`  | Create a new stack, optionally initialized with values and a constructor.<br>T.C: O(n), S.C: O(n) |
-| `push(value)`                     | Push value onto the stack.<br>T.C: O(1), S.C: O(1)                                                |
-| `pop()`                           | Remove and return the top value.<br>T.C: O(1), S.C: O(1)                                          |
-| `emplace(...args)`                | Construct and push a value using the provided constructor.<br>T.C: O(1), S.C: O(1)                |
-| `clear()`                         | Remove all elements.<br>T.C: O(n), S.C: O(1)                                                      |
-| `isEmpty()`                       | Returns `true` if the stack is empty.<br>T.C: O(1), S.C: O(1)                                     |
-| `top` (getter/setter)             | Get or set the top value.<br>T.C: O(1), S.C: O(1)                                                 |
-| `[Symbol.iterator]()`             | Iterate from top to bottom.<br>T.C: O(1), S.C: O(1)                                               |
-| `length`                          | Number of elements in the stack.<br>T.C: O(1), S.C: O(1)                                          |
-| `Stack.equals(a, b, comparator?)` | Check if two stacks are equal. Optionally provide a comparator.<br>T.C: O(n), S.C: O(1)           |
-| `Stack.swap(a, b)`                | Swap the contents of two stacks.<br>T.C: O(1), S.C: O(1)                                          |
+- `top = val` throws if stack is empty.
+- `assign()` throws if invalid range or arguments.
+- `clone()` throws if `structuredClone` not available and no fallback provided.
 
 ---
 
-## Example
+## 🧠 Performance
 
-```ts
-const stack = new Stack<number>()
-stack.push(1)
-stack.push(2)
-stack.push(3)
-console.log(stack.top) // 3
-console.log(stack.pop()) // 3
-console.log([...stack]) // [2, 1]
-```
+| Operation  | Time Complexity |
+| ---------- | --------------- |
+| push / pop | O(1)            |
+| assign     | O(n)            |
+| clone      | O(n)            |
+| toArray    | O(n)            |
 
 ---
 
-## Notes
+## 💡 Compatibility
 
-- The stack is implemented as a singly linked list for efficient O(1) push/pop.
-- The `emplace` method requires a constructor to be provided at stack creation.
-- Iteration yields values from top to bottom.
+- Requires ES2022+ (`#private fields` and optional `structuredClone`)
+- If using in Node.js < 18, provide a polyfill or custom `deepCloneFn`
+
+---
+
+## 📘 API Reference
+
+| Method / Property | Signature                                           | Description                          |
+| ----------------- | --------------------------------------------------- | ------------------------------------ |
+| `push`            | `(value: T): void`                                  | Push a value onto the stack          |
+| `pop`             | `(): T \| undefined`                                | Pop the top value from the stack     |
+| `peek`            | `(): T \| undefined`                                | Return the top value without popping |
+| `emplace`         | `(...args: A): void`                                | Push using a factory                 |
+| `assign` (count)  | `(count: number, value: T): void`                   | Fill stack with repeated value       |
+| `assign` (slice)  | `(values: T[], start?: number, end?: number): void` | Fill stack with slice of array       |
+| `clone`           | `(deepCloneFn?): Stack<T, A>`                       | Clone the stack                      |
+| `clear`           | `(): void`                                          | Empty the stack                      |
+| `toArray`         | `(): T[]`                                           | Convert to array                     |
+| `forEach`         | `(cb, thisArg?): void`                              | Loop through elements                |
+| `begin`           | `(): IterableIterator<T>`                           | Forward iterator                     |
+| `rbegin`          | `(): IterableIterator<T>`                           | Reverse iterator                     |
+| `length`          | `number`                                            | Number of elements                   |
+| `top`             | `T \| undefined` (getter/setter)                    | Get/set top value                    |
+| `Stack.equals`    | `(stack1, stack2, comparator?): boolean`            | Compare two stacks                   |
+| `Stack.swap`      | `(stack1, stack2): void`                            | Swap contents of two stacks          |
+
+---
+
+## 📎 License & Contributions
+
+This package is open-source under the MIT License. Feel free to submit issues or pull requests on GitHub.

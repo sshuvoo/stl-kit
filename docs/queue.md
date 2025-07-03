@@ -1,152 +1,213 @@
 # Queue
 
-A classic queue (FIFO) data structure implementation for JavaScript/TypeScript, supporting efficient push and pop operations, iteration, and advanced features like emplace and static utilities. Generic and type-safe for all types.
+A classic, robust and developer-friendly **Queue** (FIFO) data structure implemented in TypeScript using a **doubly linked list** internally. Designed for flexibility, extensibility, and performance with support for `emplace`, `clone`, STL-style iterators, and more.
 
 ---
 
-## Constructor
-
-### `new Queue(values?: T[], TypeCtor?: Constructor<T, A>)`
-
-Create a new queue, optionally initialized with an array of values. Optionally provide a constructor for emplace.
+## 🚀 Quick Start
 
 ```ts
-const queue = new Queue<number>() // Empty queue
-const queue2 = new Queue(['a', 'b', 'c']) // ['a', 'b', 'c'] (front is 'a')
+import { Queue } from 'stl-kit'
+
+const queue = new Queue<number>()
+queue.push(10)
+queue.push(20)
+console.log(queue.pop()) // 10
 ```
 
 ---
 
-## Methods & Properties
-
-### `.push(value: T): void`
-
-Push a value to the back of the queue.
+## 🏗️ Constructor
 
 ```ts
-queue.push(10) // [10]
+new Queue<T, A>(options?: {
+  initValues?: T[]
+  factory?: (...args: A) => T
+})
+```
+
+- `initValues`: Optional array of values to prefill the queue.
+- `factory`: Optional factory for use with `emplace()`.
+
+---
+
+## 📚 Instance Methods
+
+### `push(value: T): void`
+
+Adds a value to the back of the queue.
+
+```ts
+queue.push(42)
 ```
 
 ---
 
-### `.pop(): T | undefined`
+### `pop(): T | undefined`
 
-Remove and return the front value.
+Removes and returns the front value. Returns `undefined` if empty.
 
 ```ts
-const first = queue.pop() // 10, queue is now []
+const val = queue.pop()
 ```
 
 ---
 
-### `.emplace(...args: A): void`
+### `peekFirst(): T | undefined`
 
-Construct and push a value using the provided constructor and arguments.
+Returns the front value without removing it.
 
 ```ts
-class Point {
-  constructor(
-    public x: number,
-    public y: number,
-  ) {}
-}
-const queue = new Queue<Point, [number, number]>([], Point)
-// Or even shorter
-const queue = new Queue([], Point)
-
-queue.emplace(1, 2) // queue.back is Point { x: 1, y: 2 }
+queue.peekFirst()
 ```
 
 ---
 
-### `.clear(): void`
+### `peekLast(): T | undefined`
 
-Remove all elements from the queue.
+Returns the back value without removing it.
 
 ```ts
-queue.clear() // []
+queue.peekLast()
 ```
 
 ---
 
-### `.isEmpty(): boolean`
+### `emplace(...args: A): void`
 
-Returns `true` if the queue is empty.
+Constructs and pushes a value using the provided factory.
 
 ```ts
-queue.isEmpty() // true
+const queue = new Queue<Person, [string, number]>({
+  factory: (name, age) => new Person(name, age),
+})
+queue.emplace('Alice', 30)
 ```
 
 ---
 
-### `.front: T | undefined` (getter/setter)
+### `assign(count: number, value: T): void`
 
-Get or set the front value.
+Fills the queue with `count` copies of `value`.
 
 ```ts
-console.log(queue.front) // 10
-queue.front = 20 // replaces front value with 20
+queue.assign(3, 99) // [99, 99, 99]
 ```
 
 ---
 
-### `.back: T | undefined` (getter/setter)
+### `assign(values: T[], start?: number, end?: number): void`
 
-Get or set the back value.
+Fills the queue with a slice of `values`.
 
 ```ts
-console.log(queue.back) // 30
-queue.back = 40 // replaces back value with 40
+queue.assign([1, 2, 3, 4], 1, 3) // [2, 3]
 ```
 
 ---
 
-### `Iteration: IterableIterator<T>`
+### `clone(deepCloneFn?: (val: T) => T): Queue<T, A>`
 
-Iterate from front to back.
+Returns a deep copy of the queue. Defaults to `structuredClone`.
 
 ```ts
-for (const value of queue) {
-  // ...
-}
+const deep = queue.clone()
+const shallow = queue.clone((v) => v)
 ```
 
 ---
 
-### `.toArray(): T[]`
+### `clear(): void`
 
-Convert the queue to an array (from front to back).
+Removes all elements.
 
 ```ts
-const arr = queue.toArray() // [1, 2, 3]
+queue.clear()
 ```
 
 ---
 
-### `.length: number`
+### `toArray(): T[]`
 
-Number of elements in the queue.
+Returns a shallow copy of the queue as an array.
 
 ```ts
-console.log(queue.length) // 3
+const arr = queue.toArray()
 ```
 
 ---
 
-### `Queue.equals(queue1, queue2, comparator?): boolean` (static)
+### `forEach(cb, thisArg?)`
 
-Check if two queues are equal (element-wise). Optionally, provide a custom comparator function.
+Iterates through the queue from front to back.
 
 ```ts
-Queue.equals(queue1, queue2) // true or false (uses === by default)
-Queue.equals(queue1, queue2, (a, b) => a.id === b.id) // custom comparison
+queue.forEach((val, i) => console.log(val, i))
 ```
 
 ---
 
-### `Queue.swap(queue1, queue2): void` (static)
+### `begin(): IterableIterator<T>`
 
-Swap the contents of two queues.
+Returns a forward iterator (default direction).
+
+```ts
+for (const val of queue.begin()) { ... }
+```
+
+---
+
+### `rbegin(): IterableIterator<T>`
+
+Returns a reverse iterator (from back to front).
+
+```ts
+for (const val of queue.rbegin()) { ... }
+```
+
+---
+
+## 🧾 Properties
+
+### `length: number`
+
+Current number of elements in the queue.
+
+### `front: T | undefined`
+
+Getter/setter for the front value.
+
+```ts
+queue.front = 99
+const val = queue.front
+```
+
+### `back: T | undefined`
+
+Getter/setter for the back value.
+
+```ts
+queue.back = 42
+const val = queue.back
+```
+
+---
+
+## 🧰 Static Methods
+
+### `Queue.equals(queue1, queue2, comparator?): boolean`
+
+Checks equality of two queues. Optionally pass a comparator.
+
+```ts
+Queue.equals(queueA, queueB)
+```
+
+---
+
+### `Queue.swap(queue1, queue2): void`
+
+Swaps contents of two queues (must use same factory).
 
 ```ts
 Queue.swap(queue1, queue2)
@@ -154,42 +215,57 @@ Queue.swap(queue1, queue2)
 
 ---
 
-## API Reference
+## ⚠️ Error Handling
 
-| Method / Property                 | Description                                                                                       |
-| --------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `constructor(values, TypeCtor?)`  | Create a new queue, optionally initialized with values and a constructor.<br>T.C: O(n), S.C: O(n) |
-| `push(value)`                     | Push value to the back of the queue.<br>T.C: O(1), S.C: O(1)                                      |
-| `pop()`                           | Remove and return the front value.<br>T.C: O(1), S.C: O(1)                                        |
-| `emplace(...args)`                | Construct and push a value using the provided constructor.<br>T.C: O(1), S.C: O(1)                |
-| `clear()`                         | Remove all elements.<br>T.C: O(n), S.C: O(1)                                                      |
-| `isEmpty()`                       | Returns `true` if the queue is empty.<br>T.C: O(1), S.C: O(1)                                     |
-| `front` (getter/setter)           | Get or set the front value.<br>T.C: O(1), S.C: O(1)                                               |
-| `back` (getter/setter)            | Get or set the back value.<br>T.C: O(1), S.C: O(1)                                                |
-| `[Symbol.iterator]()`             | Iterate from front to back.<br>T.C: O(1), S.C: O(1)                                               |
-| `toArray()`                       | Convert the queue to an array.<br>T.C: O(n), S.C: O(n)                                            |
-| `length`                          | Number of elements in the queue.<br>T.C: O(1), S.C: O(1)                                          |
-| `Queue.equals(a, b, comparator?)` | Check if two queues are equal. Optionally provide a comparator.<br>T.C: O(n), S.C: O(1)           |
-| `Queue.swap(a, b)`                | Swap the contents of two queues.<br>T.C: O(1), S.C: O(1)                                          |
+- `front = val`/`back = val` throws if queue is empty.
+- `assign()` throws if invalid range or arguments.
+- `clone()` throws if `structuredClone` not available and no fallback provided.
 
 ---
 
-## Example
+## 🧠 Performance
 
-```ts
-const queue = new Queue<number>()
-queue.push(1)
-queue.push(2)
-queue.push(3)
-console.log(queue.front) // 1
-console.log(queue.pop()) // 1
-console.log([...queue]) // [2, 3]
-```
+| Operation  | Time Complexity |
+| ---------- | --------------- |
+| push / pop | O(1)            |
+| assign     | O(n)            |
+| clone      | O(n)            |
+| toArray    | O(n)            |
 
 ---
 
-## Notes
+## 💡 Compatibility
 
-- The queue is implemented as a singly linked list for efficient O(1) push/pop.
-- The `emplace` method requires a constructor to be provided at queue creation.
-- Iteration yields values from front to back.
+- Requires ES2022+ (`#private fields` and optional `structuredClone`)
+- If using in Node.js < 18, provide a polyfill or custom `deepCloneFn`
+
+---
+
+## 📘 API Reference
+
+| Method / Property | Signature                                           | Description                        |
+| ----------------- | --------------------------------------------------- | ---------------------------------- |
+| `push`            | `(value: T): void`                                  | Push a value to the back           |
+| `pop`             | `(): T \| undefined`                                | Pop the front value from the queue |
+| `peekFirst`       | `(): T \| undefined`                                | Return the front value             |
+| `peekLast`        | `(): T \| undefined`                                | Return the back value              |
+| `emplace`         | `(...args: A): void`                                | Push using a factory               |
+| `assign` (count)  | `(count: number, value: T): void`                   | Fill queue with repeated value     |
+| `assign` (slice)  | `(values: T[], start?: number, end?: number): void` | Fill queue with slice of array     |
+| `clone`           | `(deepCloneFn?): Queue<T, A>`                       | Clone the queue                    |
+| `clear`           | `(): void`                                          | Empty the queue                    |
+| `toArray`         | `(): T[]`                                           | Convert to array                   |
+| `forEach`         | `(cb, thisArg?): void`                              | Loop through elements              |
+| `begin`           | `(): IterableIterator<T>`                           | Forward iterator                   |
+| `rbegin`          | `(): IterableIterator<T>`                           | Reverse iterator                   |
+| `length`          | `number`                                            | Number of elements                 |
+| `front`           | `T \| undefined` (getter/setter)                    | Get/set front value                |
+| `back`            | `T \| undefined` (getter/setter)                    | Get/set back value                 |
+| `Queue.equals`    | `(queue1, queue2, comparator?): boolean`            | Compare two queues                 |
+| `Queue.swap`      | `(queue1, queue2): void`                            | Swap contents of two queues        |
+
+---
+
+## 📎 License & Contributions
+
+This package is open-source under the MIT License. Feel free to submit issues or pull requests on GitHub.
