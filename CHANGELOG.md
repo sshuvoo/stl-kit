@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [5.1.0] - 2025-07-03
+
+### Added
+
+- New methods added to `Stack` and `Queue`
+
+### Fixed
+
+- Fixed potential bugs in `Stack` and `Queue` implementations
+
+---
+
 ## [5.0.0] - 2025-07-03
 
 ### Added
