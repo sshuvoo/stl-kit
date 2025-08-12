@@ -13,6 +13,17 @@ export class Heap<T, A extends unknown[] = unknown[]> {
   #compareFn: CompareFn<T>
   #factory?: Factory<T, A>
 
+  /**
+   * Creates a new Heap.
+   * By default, it's a max heap (biggest item on top).
+   * Use `compareFn` for min heap or custom sorting.
+   * @param {Object} options - Heap options
+   * @param {T[]} [options.initValues] - Items to start with
+   * @param {CompareFn<T>} [options.compareFn] - Function to compare items
+   * @param {Factory<T, A>} [options.factory] - Function to create items for emplace
+   * @example
+   * const heap = new Heap({ initValues: [5, 2, 8] })
+   */
   constructor({ initValues, compareFn, factory }: HeapOptions<T, A> = {}) {
     if (typeof compareFn == 'function') {
       this.#compareFn = compareFn
@@ -75,17 +86,36 @@ export class Heap<T, A extends unknown[] = unknown[]> {
   }
 
   // Iterable
+  /**
+   * Iterate over all items in the heap.
+   * @returns {IterableIterator<T>} Iterator for items
+   * @example
+   * for (const x of heap) { ... }
+   */
   *[Symbol.iterator](): IterableIterator<T> {
     for (const val of this.#nodes) {
       yield val
     }
   }
 
+  /**
+   * Add a new item to the heap.
+   * @param {T} node - The item to add
+   * @example
+   * heap.push(5)
+   */
   push(node: T): void {
     let cIdx = this.#nodes.push(node) - 1 //current index
     this.#heapifyUp(cIdx)
   }
 
+  /**
+   * Add a new item using the factory function.
+   * Useful for creating complex objects.
+   * @param {...A} args - Arguments for the factory function
+   * @example
+   * heap.emplace('Car', 5)
+   */
   emplace(...args: A): void {
     if (typeof this.#factory !== 'function') {
       throw new Error('Heap was not initialized with a factory function')
@@ -93,6 +123,14 @@ export class Heap<T, A extends unknown[] = unknown[]> {
     this.push(this.#factory(...args))
   }
 
+  /**
+   * Replace the top item with a new one, and return the old top item.
+   * @param {T} node - The new item
+   * @returns {T} The old top item
+   * @throws {Error} If the heap is empty
+   * @example
+   * heap.replace(7)
+   */
   replace(node: T): T {
     if (this.isEmpty()) {
       throw new Error('Heap is empty, cannot replace root node.')
@@ -103,6 +141,13 @@ export class Heap<T, A extends unknown[] = unknown[]> {
     return root
   }
 
+  /**
+   * Remove and return the top item from the heap.
+   * @returns {T} The removed top item
+   * @throws {Error} If the heap is empty
+   * @example
+   * heap.pop()
+   */
   pop(): T {
     if (this.isEmpty()) {
       throw new Error('Heap is empty, cannot pop element.')
@@ -117,22 +162,51 @@ export class Heap<T, A extends unknown[] = unknown[]> {
     return root
   }
 
+  /**
+   * See the top item without removing it.
+   * @returns {T|undefined} The top item or undefined if empty
+   * @example
+   * heap.peek()
+   */
   peek(): T | undefined {
     return this.#nodes[0]
   }
 
+  /**
+   * Check if the heap is empty.
+   * @returns {boolean} True if empty, false otherwise
+   * @example
+   * heap.isEmpty()
+   */
   isEmpty(): boolean {
     return this.#nodes.length === 0
   }
 
+  /**
+   * Remove all items from the heap.
+   * @example
+   * heap.clear()
+   */
   clear(): void {
     this.#nodes.length = 0
   }
 
+  /**
+   * Get the number of items in the heap.
+   * @returns {number} The size of the heap
+   * @example
+   * heap.size()
+   */
   size(): number {
     return this.#nodes.length
   }
 
+  /**
+   * Get all items as an array (not sorted).
+   * @returns {T[]} Array of items
+   * @example
+   * heap.toArray()
+   */
   toArray(): T[] {
     return [...this.#nodes]
   }

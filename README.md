@@ -61,6 +61,7 @@ Full documentation for each data structure and API is available below:
 - [Queue Documentation](./docs/queue.md)
 - [Deque Documentation](./docs/deque.md)
 - [Vector Documentation](./docs/vector.md)
+- [Heap Documentation](./docs/heap.md)
 
 Each file contains detailed usage, API reference, and examples for the respective data structure.
 
