@@ -12,7 +12,11 @@
   </a>
 </p>
 
-A modern JavaScript & TypeScript standard template library (STL) for data structures and algorithms. Includes high-performance implementations of Stack, Queue, Deque, Linked List, Vector, Set, Map, Tree, Heap, and Graph — inspired by C++ STL. Designed for performance, reusability, and clean, type-safe APIs.
+A modern, high-performance JavaScript & TypeScript standard template library (STL) for classic and advanced data structures and algorithms. This library provides robust, type-safe, and reusable implementations of Stack, Queue, Deque, Linked List, Vector, Set, Map, Tree, Heap, Priority Queue, and Graph—designed for both beginners and professionals.
+
+Use STL Kit to solve algorithmic problems, build efficient applications, or teach data structures in TypeScript or JavaScript. All data structures are optimized for performance and usability, with clean APIs and full documentation. Works seamlessly in Node.js, browser, and modern JavaScript/TypeScript projects.
+
+Whether you need a fast priority queue for scheduling, a heap for sorting, or a linked list for flexible data manipulation, STL Kit has you covered. Explore the docs for detailed guides and examples.
 
 ---
 
@@ -39,31 +43,114 @@ pnpm add stl-kit
 
 ---
 
-## Usage
+## Data Structures Overview & Quick Examples
 
-Import the desired data structure:
+Below are the main data structures included in STL Kit, with a quick example for each. For full API and advanced usage, see the linked documentation in the [docs/](./docs/) folder.
+
+### LinkedList
+
+Efficient doubly-linked list for fast insertions/removals.
 
 ```ts
-// Using ES6 import
 import { LinkedList } from 'stl-kit'
-// Using CommonJS require
-const { LinkedList } = require('stl-kit')
+const list = new LinkedList([1, 2, 3])
+list.push(4)
+console.log([...list]) // [1, 2, 3, 4]
 ```
+
+See: [LinkedList Documentation](./docs/linked-list.md)
+
+### Stack
+
+LIFO (last-in, first-out) stack.
+
+```ts
+import { Stack } from 'stl-kit'
+const stack = new Stack([1, 2])
+stack.push(3)
+console.log(stack.pop()) // 3
+```
+
+See: [Stack Documentation](./docs/stack.md)
+
+### Queue
+
+FIFO (first-in, first-out) queue.
+
+```ts
+import { Queue } from 'stl-kit'
+const queue = new Queue([1, 2])
+queue.push(3)
+console.log(queue.pop()) // 1
+```
+
+See: [Queue Documentation](./docs/queue.md)
+
+### Deque
+
+Double-ended queue (push/pop from both ends).
+
+```ts
+import { Deque } from 'stl-kit'
+const dq = new Deque([1, 2])
+dq.unshift(0)
+console.log(dq.pop()) // 2
+```
+
+See: [Deque Documentation](./docs/deque.md)
+
+### Vector
+
+Resizable array with fast random access.
+
+```ts
+import { Vector } from 'stl-kit'
+const v = new Vector([1, 2])
+v.push(3)
+console.log(v.get(1)) // 2
+```
+
+See: [Vector Documentation](./docs/vector.md)
+
+### Heap
+
+Efficient min/max heap for priority-based access.
+
+```ts
+import { Heap } from 'stl-kit'
+const heap = new Heap({ initValues: [5, 2, 8] })
+heap.push(1)
+console.log(heap.pop()) // 8 (default is max-heap)
+```
+
+See: [Heap Documentation](./docs/heap.md)
+
+### PriorityQueue
+
+Priority queue built on a heap. Use numbers or custom objects with priorities.
+
+```ts
+import { PriorityQueue } from 'stl-kit'
+const pq = new PriorityQueue({ initValues: [5, 2, 8] })
+pq.push(1)
+console.log(pq.pop()) // 1 (min-heap by default)
+
+// For custom objects:
+const pq2 = new PriorityQueue({
+  initValues: [
+    { priority: 2, value: 'task2' },
+    { priority: 1, value: 'task1' },
+  ],
+  compareFn: (a, b) => a.priority - b.priority,
+})
+console.log(pq2.pop()) // { priority: 1, value: 'task1' }
+```
+
+See: [PriorityQueue Documentation](./docs/priority-queue.md)
 
 ---
 
-## Documentation
-
-Full documentation for each data structure and API is available below:
-
-- [LinkedList Documentation](./docs/linked-list.md)
-- [Stack Documentation](./docs/stack.md)
-- [Queue Documentation](./docs/queue.md)
-- [Deque Documentation](./docs/deque.md)
-- [Vector Documentation](./docs/vector.md)
-- [Heap Documentation](./docs/heap.md)
-
-Each file contains detailed usage, API reference, and examples for the respective data structure.
+For full API, advanced usage, and more data structures, see the [docs/](./docs/) folder.
 
 ## Contributing
 
