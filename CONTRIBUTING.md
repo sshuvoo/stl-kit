@@ -1,6 +1,6 @@
-# Contributing to JavaScript STL
+# Contributing to stl-kit
 
-Thank you for your interest in contributing to the JavaScript Standard Template Library (STL)! We welcome contributions from the community and appreciate your help in making this library better.
+Thank you for your interest in contributing to **stl-kit** — a modern JavaScript & TypeScript Standard Template Library (STL)! We welcome contributions from the community and appreciate your help in making this library better.
 
 ## Table of Contents
 
@@ -24,8 +24,8 @@ To get started with contributing, please ensure you have the following prerequis
 Clone the repository to your local machine:
 
 ```sh
-git clone git+ssh://git@github.com/sshuvoo/javascript-stl.git
-cd javascript-stl
+git clone git@github.com:sshuvoo/stl-kit.git
+cd stl-kit
 ```
 
 Install the dependencies:
@@ -61,9 +61,15 @@ We welcome feature requests! If you have an idea for a new feature or improvemen
    ```
 3. **Make your changes**: Implement your feature or fix the bug.
 4. **Commit your changes**: Write a clear and concise commit message.
+
+   > **Please use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for your commit messages.** This helps automate changelogs and makes your contributions easier to review. Learn more at [conventionalcommits.org](https://www.conventionalcommits.org/en/v1.0.0/).
+
+   Example:
+
    ```sh
-   git commit -m "Add feature X or fix bug Y"
+   git commit -m "feat(linked-list): add reverse method"
    ```
+
 5. **Push to your fork**: Push your changes to your forked repository.
    ```sh
    git push origin my-feature-branch
@@ -75,19 +81,20 @@ We welcome feature requests! If you have an idea for a new feature or improvemen
 Before submitting your changes, ensure that all tests pass. You can run the tests using the following command:
 
 ```sh
-npm test
+npm run test
 ```
 
-If you are adding new features, please include tests to cover your changes.
+If you are adding new features, please include tests to cover your changes. Test coverage is important for maintaining code quality.
 
 ## Style Guide
 
 To maintain consistency in the codebase, please adhere to the following style guidelines:
 
-- Follow the TypeScript coding conventions.
+- Follow TypeScript and modern JavaScript best practices.
 - Use descriptive variable and function names.
 - Write clear and concise comments where necessary.
-- Ensure proper indentation and formatting.
+- Ensure proper indentation and formatting (use Prettier: `npm run format`).
+- Keep pull requests focused and minimal; unrelated changes should be submitted separately.
 
 ## License
 
@@ -95,4 +102,4 @@ By contributing to this project, you agree that your contributions will be licen
 
 ---
 
-Thank you for contributing to the JavaScript STL! Your efforts help improve the library for everyone. If you have any questions, feel free to reach out to the maintainers.
+Thank you for contributing to **stl-kit**! Your efforts help improve the library for everyone. If you have any questions, feel free to reach out to the maintainers via GitHub Discussions or Issues.
