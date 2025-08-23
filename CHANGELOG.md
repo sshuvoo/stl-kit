@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+# [5.4.0] - 2025-08-23
+
+### Removed
+
+- Data Structure: `Heap` has been removed from the public API and repository.
+  Users relying on `Heap` should migrate to `PriorityQueue` which now
+  provides equivalent (and more flexible) behaviour via custom comparators.
+
+### Changed
+
+- `PriorityQueue` upgraded to be fully flexible: it can operate as a min-heap
+  or max-heap depending on the provided `compareFn`.
+- Updated `README.md` and examples to reflect the removal of `Heap` and the
+  enhanced `PriorityQueue` behaviour.
+
+### Documentation
+
+- Updated `docs/priority-queue.md` to show min-heap and max-heap examples,
+  migration notes for former `Heap` users, and additional beginner-friendly
+  explanations.
+
+### Minor
+
+- Miscellaneous small refactors, test updates, and README polish.
+
 # [5.3.0] - 2025-08-12
 
 ### Added
