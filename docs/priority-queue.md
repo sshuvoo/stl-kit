@@ -405,20 +405,20 @@ while (!copy.isEmpty()) sorted.push(copy.pop())
 
 ## 7) API Reference Table (quick sight)
 
-| Name        |                     Signature | Description                                                |                     Complexity | Throws                              |
-| ----------- | ----------------------------: | ---------------------------------------------------------- | -----------------------------: | ----------------------------------- | --- |
-| Constructor | `new PriorityQueue(options?)` | Create queue. Accepts `initValues`, `compareFn`, `factory` | O(n) if `initValues` else O(1) | TypeError if `initValues` not array |
-| push        |               `push(node: T)` | Insert element into queue                                  |                       O(log n) | If comparator throws                |
-| emplace     |         `emplace(...args: A)` | Create element with factory and insert                     |             O(log n) + factory | Error if no factory                 |
-| replace     |         `replace(node: T): T` | Replace root and return old root                           |                       O(log n) | Error if empty                      |
-| pop         |                    `pop(): T` | Remove and return root                                     |                       O(log n) | Error if empty                      |
-| peek        |                    `peek(): T | undefined`                                                 |   Return root without removing | O(1)                                | -   |
-| isEmpty     |          `isEmpty(): boolean` | True when empty                                            |                           O(1) | -                                   |
-| clear       |               `clear(): void` | Remove all elements                                        |                           O(1) | -                                   |
-| size        |              `size(): number` | Number of elements                                         |                           O(1) | -                                   |
-| length      |        `get length(): number` | Same as size (property)                                    |                           O(1) | -                                   |
-| toArray     |              `toArray(): T[]` | Shallow copy of internal heap array (heap order)           |                           O(n) | -                                   |
-| iterator    |         `[Symbol.iterator]()` | Iterate heap array order                                   |                   O(n) overall | -                                   |
+| Name        | Signature                     | Description                                                | Complexity                     |
+| ----------- | ----------------------------- | ---------------------------------------------------------- | ------------------------------ |
+| Constructor | `new PriorityQueue(options?)` | Create queue. Accepts `initValues`, `compareFn`, `factory` | O(n) if `initValues` else O(1) |
+| push        | `push(node: T)`               | Insert element into queue                                  | O(log n)                       |
+| emplace     | `emplace(...args: A)`         | Create element with factory and insert                     | O(log n) + factory             |
+| replace     | `replace(node: T): T`         | Replace root and return old root                           | O(log n)                       |
+| pop         | `pop(): T`                    | Remove and return root                                     | O(log n)                       |
+| peek        | `peek(): T \| undefined`      | Return root without removing                               | O(1)                           |
+| isEmpty     | `isEmpty(): boolean`          | True when empty                                            | O(1)                           |
+| clear       | `clear(): void`               | Remove all elements                                        | O(1)                           |
+| size        | `size(): number`              | Number of elements                                         | O(1)                           |
+| length      | `get length(): number`        | Same as size (property)                                    | O(1)                           |
+| toArray     | `toArray(): T[]`              | Shallow copy of internal heap array (heap order)           | O(n)                           |
+| iterator    | `[Symbol.iterator]()`         | Iterate heap array order                                   | O(n) overall                   |
 
 ---
 
