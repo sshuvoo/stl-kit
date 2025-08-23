@@ -1,13 +1,13 @@
 # A TypeScript-First Standard Template Library (STL) for Data Structures & Algorithms
 
 <p align="center">
-  <a href="https://github.com/sshuvoo/javascript-stl/blob/master/LICENSE">
+  <a href="https://github.com/sshuvoo/stl-kit/blob/master/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="STL Kit is released under the MIT license." />
   </a>
   <a href="https://www.npmjs.org/package/stl-kit">
     <img src="https://img.shields.io/npm/v/stl-kit?color=brightgreen&label=npm%20package" alt="Current npm package version." />
   </a>
-  <a href="https://github.com/sshuvoo/javascript-stl/pulls">
+  <a href="https://github.com/sshuvoo/stl-kit/pulls">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
   </a>
 </p>
@@ -22,11 +22,19 @@ Whether you need a fast priority queue for scheduling, a heap for sorting, or a 
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
-- [License](#license)
+- [A TypeScript-First Standard Template Library (STL) for Data Structures \& Algorithms](#a-typescript-first-standard-template-library-stl-for-data-structures--algorithms)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Data Structures Overview \& Quick Examples](#data-structures-overview--quick-examples)
+    - [LinkedList](#linkedlist)
+    - [Deque](#deque)
+    - [Queue](#queue)
+    - [Stack](#stack)
+    - [Vector](#vector)
+    - [PriorityQueue](#priorityqueue)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Coming Soon](#coming-soon)
 
 ---
 
@@ -45,112 +53,186 @@ pnpm add stl-kit
 
 ## Data Structures Overview & Quick Examples
 
-Below are the main data structures included in STL Kit, with a quick example for each. For full API and advanced usage, see the linked documentation in the [docs/](./docs/) folder.
+This section gives a short, practical introduction to the most used data
+structures in STL Kit so you can get started quickly. Each entry shows the
+purpose, the most commonly used methods from this implementation, a small
+example you can copy, and a link to the full documentation in `docs/` for
+complete details and advanced usage.
+
+Important: examples show the library's actual method names (they match the
+implementation in `src/structures`). For deeper explanations and edge cases,
+follow the detailed guides linked below.
 
 ### LinkedList
 
-Efficient doubly-linked list for fast insertions/removals.
+Doubly-linked list useful when you need efficient insertion/removal at both
+ends and constant-time splicing operations.
 
-```ts
+Common methods (from this implementation):
+
+- `pushFront(value)`, `pushBack(value)` — add at head or tail
+- `popFront()`, `popBack()` — remove from head or tail
+- `insertAt(value, index)`, `eraseAt(index)` — insert or remove at index
+- `isEmpty()`, `clear()`, `toArray()` — utility helpers
+
+Example:
+
+```js
 import { LinkedList } from 'stl-kit'
-const list = new LinkedList([1, 2, 3])
-list.push(4)
-console.log([...list]) // [1, 2, 3, 4]
+
+const list = new LinkedList({ initValues: [1, 2, 3] })
+list.pushFront(0) // [0, 1, 2, 3]
+list.pushBack(4) // [0, 1, 2, 3, 4]
+console.log(list.popFront()) // 0
+console.log(list.popBack()) // 4
+console.log(list.toArray()) // [1, 2, 3]
 ```
 
-See: [LinkedList Documentation](./docs/linked-list.md)
-
-### Stack
-
-LIFO (last-in, first-out) stack.
-
-```ts
-import { Stack } from 'stl-kit'
-const stack = new Stack([1, 2])
-stack.push(3)
-console.log(stack.pop()) // 3
-```
-
-See: [Stack Documentation](./docs/stack.md)
-
-### Queue
-
-FIFO (first-in, first-out) queue.
-
-```ts
-import { Queue } from 'stl-kit'
-const queue = new Queue([1, 2])
-queue.push(3)
-console.log(queue.pop()) // 1
-```
-
-See: [Queue Documentation](./docs/queue.md)
+Full guide: [docs/linked-list.md](docs/linked-list.md)
 
 ### Deque
 
-Double-ended queue (push/pop from both ends).
+Double-ended queue implemented with a linked list. Use when you need a
+queue that can push/pop at both ends efficiently.
 
-```ts
+Common methods:
+
+- `pushFront(value)`, `pushBack(value)`
+- `popFront()`, `popBack()`
+- `front`, `back` getters/setters, `isEmpty()`, `toArray()`
+
+Example:
+
+```js
 import { Deque } from 'stl-kit'
-const dq = new Deque([1, 2])
-dq.unshift(0)
-console.log(dq.pop()) // 2
+
+const dq = new Deque()
+dq.pushBack(1)
+dq.pushFront(0)
+console.log(dq.front) // 0
+console.log(dq.popBack()) // 1
 ```
 
-See: [Deque Documentation](./docs/deque.md)
+Full guide: [docs/deque.md](docs/deque.md)
+
+### Queue
+
+FIFO queue using a linked list under the hood — ideal for breadth-first
+algorithms and simple task scheduling.
+
+Common methods:
+
+- `push(value)`, `pop()`, `peek()`
+- `isEmpty()`, `clear()`, `toArray()`
+
+Example:
+
+```js
+import { Queue } from 'stl-kit'
+
+const q = new Queue()
+q.push('a')
+q.push('b')
+console.log(q.peek()) // 'a'
+console.log(q.pop()) // 'a'
+```
+
+Full guide: [docs/queue.md](docs/queue.md)
+
+### Stack
+
+LIFO stack implemented with a linked list. Use for depth-first search,
+function call simulation, or any LIFO ordering.
+
+Common methods:
+
+- `push(value)`, `pop()`
+- `top` getter/setter, `peek()` (alias), `isEmpty()`, `toArray()`
+
+Example:
+
+```js
+import { Stack } from 'stl-kit'
+
+const s = new Stack()
+s.push(1)
+s.push(2)
+console.log(s.top) // 2
+console.log(s.pop()) // 2
+```
+
+Full guide: [docs/stack.md](docs/stack.md)
 
 ### Vector
 
-Resizable array with fast random access.
+Resizable array (extends JavaScript Array) with STL-style helpers. Use when
+you want array semantics plus convenience methods found in classical STL
+vectors.
 
-```ts
+Common methods:
+
+- `pushBack(val)`, `popBack()`, `pushFront(val)`, `popFront()`
+- `insertAt(index, val)`, `eraseAt(index)`, `resize(n)`
+- `front`, `back`, `isEmpty()`
+
+Example:
+
+```js
 import { Vector } from 'stl-kit'
-const v = new Vector([1, 2])
-v.push(3)
-console.log(v.get(1)) // 2
+
+const v = new Vector({ initValues: [1, 2, 3] })
+v.pushBack(4)
+v.insertAt(1, 9)
+console.log(v.toString()) // ['1', '9', '2', '3', '4'] (Array methods work)
 ```
 
-See: [Vector Documentation](./docs/vector.md)
-
-### Heap
-
-Efficient min/max heap for priority-based access.
-
-```ts
-import { Heap } from 'stl-kit'
-const heap = new Heap({ initValues: [5, 2, 8] })
-heap.push(1)
-console.log(heap.pop()) // 8 (default is max-heap)
-```
-
-See: [Heap Documentation](./docs/heap.md)
+Full guide: [docs/vector.md](docs/vector.md)
 
 ### PriorityQueue
 
-Priority queue built on a heap. Use numbers or custom objects with priorities.
+A high-performance priority queue backed by a binary heap (array-based).
+By default it behaves as a numeric max-heap, but you can provide a
+custom `compareFn` to change ordering (min-heap, object priorities, etc.).
 
-```ts
+Common methods:
+
+- `push(node)`, `pop()` — insert and extract highest-priority element
+- `peek()` — inspect highest-priority element without removing
+- `replace(node)` — replace root and restore heap (more efficient than
+  `pop()` + `push()`)
+- `emplace(...args)` — construct in-place using provided factory
+- `size()` / `length`, `toArray()`, `isEmpty()`
+
+Example (max-heap by default):
+
+```js
 import { PriorityQueue } from 'stl-kit'
-const pq = new PriorityQueue({ initValues: [5, 2, 8] })
-pq.push(1)
-console.log(pq.pop()) // 1 (min-heap by default)
 
-// For custom objects:
-const pq2 = new PriorityQueue({
-  initValues: [
-    { priority: 2, value: 'task2' },
-    { priority: 1, value: 'task1' },
-  ],
-  compareFn: (a, b) => a.priority - b.priority,
-})
-console.log(pq2.pop()) // { priority: 1, value: 'task1' }
+const pq = new PriorityQueue()
+pq.push(1)
+pq.push(5)
+pq.push(3)
+console.log(pq.peek()) // 5
+console.log(pq.pop()) // 5
 ```
 
-See: [PriorityQueue Documentation](./docs/priority-queue.md)
+Example (min-heap via custom comparator):
+
+```js
+const minPQ = new PriorityQueue({ compareFn: (a, b) => b - a })
+minPQ.push(5)
+minPQ.push(1)
+console.log(minPQ.pop()) // 1
+```
+
+Full guide: [docs/priority-queue.md](docs/priority-queue.md)
 
 ---
 
-For full API, advanced usage, and more data structures, see the [docs/](./docs/) folder.
+If you'd like a deeper tutorial or additional examples (TypeScript generics,
+factories for `emplace`, working with objects, or performance tips), check
+the linked docs under `docs/` or open an issue/PR so we can improve the
+material.
 
 ## Contributing
 
