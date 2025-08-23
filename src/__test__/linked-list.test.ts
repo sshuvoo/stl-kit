@@ -168,7 +168,9 @@ describe('LinkedList', () => {
     it('should iterate with callback', () => {
       list.assign([1, 2, 3])
       const arr: number[] = []
-      list.forEach((v) => arr.push(v))
+      list.forEach((v) => {
+        arr.push(v)
+      })
       expect(arr).toEqual([1, 2, 3])
     })
     it('should break if callback returns false', () => {
@@ -209,7 +211,9 @@ describe('LinkedList', () => {
       expect([...list]).toEqual([1, 3, 4])
     })
     it('should use custom compareFn', () => {
-      list.assign(['a', 'b', 'A', 'B'] as any)
+      const list = new LinkedList<string>()
+      list.assign(['a', 'b', 'A', 'B'])
+
       const count = list.remove(
         'a',
         (a, b) => a.toLowerCase() === b.toLowerCase(),
@@ -273,7 +277,6 @@ describe('LinkedList', () => {
       expect([...l2]).toEqual([1, 2])
     })
     it('should throw if not LinkedList', () => {
-      // @ts-expect-error
       expect(() => LinkedList.swap(list, null)).toThrow()
     })
   })
@@ -294,7 +297,6 @@ describe('LinkedList', () => {
       expect([...l2]).toEqual([])
     })
     it('should throw if not LinkedList', () => {
-      // @ts-expect-error
       expect(() => LinkedList.merge(list, null)).toThrow()
     })
     it('should throw if compareFn is not function', () => {

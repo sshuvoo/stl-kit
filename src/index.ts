@@ -10,6 +10,4 @@ export * from '@/core/list-node'
 
 export * from '@/structures/vector'
 
-export * from '@/structures/heap'
-
 export * from '@/structures/priority-queue'
