@@ -1,6 +1,6 @@
 {
   "name": "stl-kit",
-  "version": "5.3.0",
+  "version": "5.4.0",
   "description": "A modern JavaScript & TypeScript standard template library (STL) for data structures and algorithms. Includes high-performance implementations of Stack, Queue, Deque, Linked List, Vector, Set, Map, Tree, Heap, and Graph — inspired by C++ STL. Designed for performance, reusability, and clean, type-safe APIs.",
   "keywords": [
     "standard-template-library",
