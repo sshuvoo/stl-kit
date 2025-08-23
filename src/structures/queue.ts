@@ -188,14 +188,9 @@ export class Queue<T, A extends unknown[] = unknown[]> {
     }
   }
 
-  public peekFirst(): T | undefined {
+  public peek(): T | undefined {
     if (this.isEmpty()) return
     return this.#head!.val
-  }
-
-  public peekLast(): T | undefined {
-    if (this.isEmpty()) return
-    return this.#tail!.val
   }
 
   public clone(
