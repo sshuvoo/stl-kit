@@ -53,22 +53,12 @@ const val = queue.pop()
 
 ---
 
-### `peekFirst(): T | undefined`
+### `peek(): T | undefined`
 
 Returns the front value without removing it.
 
 ```ts
-queue.peekFirst()
-```
-
----
-
-### `peekLast(): T | undefined`
-
-Returns the back value without removing it.
-
-```ts
-queue.peekLast()
+queue.peek()
 ```
 
 ---
@@ -247,8 +237,7 @@ Queue.swap(queue1, queue2)
 | ----------------- | --------------------------------------------------- | ---------------------------------- |
 | `push`            | `(value: T): void`                                  | Push a value to the back           |
 | `pop`             | `(): T \| undefined`                                | Pop the front value from the queue |
-| `peekFirst`       | `(): T \| undefined`                                | Return the front value             |
-| `peekLast`        | `(): T \| undefined`                                | Return the back value              |
+| `peek`       | `(): T \| undefined`                                | Return the front value             |
 | `emplace`         | `(...args: A): void`                                | Push using a factory               |
 | `assign` (count)  | `(count: number, value: T): void`                   | Fill queue with repeated value     |
 | `assign` (slice)  | `(values: T[], start?: number, end?: number): void` | Fill queue with slice of array     |
