@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+# [5.4.1] - 2025-08-28
+
+### Changed
+
+- `LinkedList` getters, setters and accessors were tightened to follow
+  STL-like behaviour: accessing or mutating `front`/`back` or popping from
+  an empty list now throws a clear `Error` instead of returning `undefined`.
+
+### Documentation
+
+- Updated `docs/linked-list.md` to document the stricter empty-list
+  behavior, revised examples, and robust explanations.
+
 # [5.4.0] - 2025-08-23
 
 ### Removed
