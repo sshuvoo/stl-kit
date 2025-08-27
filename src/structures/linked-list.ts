@@ -7,11 +7,40 @@ interface ListOptions<T, A extends unknown[]> {
   factory?: Factory<T, A>
 }
 
+/**
+ * Doubly-linked list implementation.
+ *
+ * This LinkedList stores nodes in a doubly-linked chain and provides
+ * efficient O(1) insertion/removal at both ends and O(n) indexed
+ * operations. It is a general-purpose container suitable for situations
+ * where frequent splices, head/tail operations or stable references to
+ * elements are required.
+ *
+ * Type parameters:
+ * - T: element type stored in the list
+ * - A: tuple type for an optional factory function used by `emplace*`
+ *
+ * Notes for beginners:
+ * - Many methods throw on invalid usage (for example, popping from an
+ *   empty list or using an out-of-range index). Use `isEmpty()` and
+ *   `size()`/`length` to check state before mutating.
+ */
 export class LinkedList<T, A extends unknown[] = unknown[]> {
   #head: ListNode<T> | null
   #tail: ListNode<T> | null
   #length: number
   #factory?: Factory<T, A>
+  /**
+   * Create a new LinkedList.
+   *
+   * @param options.initValues - Optional array of initial values to append
+   *   to the list. Values are pushed to the back in the given order.
+   * @param options.factory - Optional factory function used by the
+   *   `emplace*` methods to create values from arguments `A`.
+   *
+   * Throws:
+   * - TypeError if `initValues` is provided but is not an array.
+   */
   constructor({ initValues, factory }: ListOptions<T, A> = {}) {
     this.#head = this.#tail = null
     this.#length = 0
@@ -28,6 +57,13 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
   }
 
   // Iterable
+  /**
+   * Iterate over values from front to back.
+   *
+   * The iterator yields elements in list order (head -> tail). This does
+   * not clone the list; mutating the list during iteration may produce
+   * unexpected results.
+   */
   *[Symbol.iterator](): IterableIterator<T> {
     let current = this.#head
     while (current !== null) {
@@ -62,7 +98,13 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     return val
   }
 
-  // Public method
+  /**
+   * Insert `value` at the front (head) of the list.
+   *
+   * Complexity: O(1).
+   *
+   * @param value - value to insert.
+   */
   public pushFront(value: T): void {
     const newNode = new ListNode(value)
 
@@ -78,6 +120,13 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     this.#length++
   }
 
+  /**
+   * Insert `value` at the back (tail) of the list.
+   *
+   * Complexity: O(1).
+   *
+   * @param value - value to insert.
+   */
   public pushBack(value: T): void {
     const newNode = new ListNode(value)
 
@@ -93,6 +142,14 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     this.#length++
   }
 
+  /**
+   * Remove and return the value at the front of the list.
+   *
+   * Complexity: O(1).
+   *
+   * @returns the removed value.
+   * @throws Error when the list is empty.
+   */
   public popFront(): T {
     // No node
     if (this.isEmpty()) {
@@ -118,6 +175,14 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     return peekVal
   }
 
+  /**
+   * Remove and return the value at the back of the list.
+   *
+   * Complexity: O(1).
+   *
+   * @returns the removed value.
+   * @throws Error when the list is empty.
+   */
   public popBack(): T {
     // No Node
     if (this.isEmpty()) {
@@ -144,6 +209,16 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     return peekVal
   }
 
+  /**
+   * Insert `val` at position `index` (0-based). Inserting at index 0
+   * prepends, inserting at `size()` appends.
+   *
+   * Complexity: O(n) in the worst case (traversal).
+   *
+   * @param val - value to insert
+   * @param index - zero-based index where to insert
+   * @throws RangeError when index is out of range
+   */
   public insertAt(val: T, index: number): void {
     if (index < 0 || index > this.#length) {
       throw new RangeError('Invalid index to insert')
@@ -177,6 +252,16 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     this.#length++
   }
 
+  /**
+   * Remove and return the element at `index`.
+   *
+   * Complexity: O(n) (traversal) unless removing from head/tail.
+   *
+   * @param index - zero-based index of the element to remove
+   * @returns removed element
+   * @throws Error when the list is empty
+   * @throws RangeError when index is out of bounds
+   */
   public eraseAt(index: number): T {
     if (this.isEmpty()) {
       throw new Error('eraseAt: Cannot erase from an empty linked list')
@@ -203,6 +288,16 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     return this.#unlink(curr)
   }
 
+  /**
+   * Construct a new element using the provided factory and insert it at
+   * the front of the list.
+   *
+   * Use this when creating the value requires multiple arguments or is
+   * expensive and you want the list to own the construction step.
+   *
+   * @param args - arguments forwarded to the factory function
+   * @throws Error if no factory was provided at construction
+   */
   public emplaceFront(...args: A): void {
     if (typeof this.#factory !== 'function') {
       throw new Error('emplaceFront: Factory function is not defined')
@@ -210,6 +305,13 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     this.pushFront(this.#factory(...args))
   }
 
+  /**
+   * Construct a new element using the provided factory and insert it at
+   * the back of the list.
+   *
+   * @param args - arguments forwarded to the factory function
+   * @throws Error if no factory was provided at construction
+   */
   public emplaceBack(...args: A): void {
     if (typeof this.#factory !== 'function') {
       throw new Error('emplaceBack: Factory function is not defined')
@@ -217,6 +319,14 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     this.pushBack(this.#factory(...args))
   }
 
+  /**
+   * Construct a new element using the provided factory and insert it at
+   * `index`.
+   *
+   * @param index - position to insert
+   * @param args - arguments forwarded to the factory
+   * @throws Error if no factory was provided at construction
+   */
   public emplaceAt(index: number, ...args: A): void {
     if (typeof this.#factory !== 'function') {
       throw new Error('emplaceAt: Factory function is not defined')
@@ -224,14 +334,30 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     this.insertAt(this.#factory(...args), index)
   }
 
+  /**
+   * Check whether the list is empty.
+   *
+   * @returns `true` when empty, otherwise `false`.
+   */
   public isEmpty(): boolean {
     return this.#length === 0
   }
 
+  /**
+   * Return the number of elements in the list.
+   *
+   * @returns non-negative integer size of the list.
+   */
   public size(): number {
     return this.#length
   }
 
+  /**
+   * Remove all elements from the list.
+   *
+   * This performs an in-place cleanup of nodes and resets internal
+   * bookkeeping.
+   */
   public clear(): void {
     if (this.isEmpty()) return
     let curr = this.#head
@@ -244,6 +370,11 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     this.#length = 0
   }
 
+  /**
+   * Return a shallow array copy of the list values in order.
+   *
+   * @returns new array with the list values (head -> tail)
+   */
   public toArray(): T[] {
     return [...this]
   }
@@ -253,6 +384,16 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
   public assign(values: T[], start?: number, end?: number): void
 
   // Implementation
+  /**
+   * Assign new contents to the list.
+   *
+   * Overloads:
+   * - `assign(values: T[], start?, end?)` — copy a slice of an array
+   * - `assign(count: number, value: T)` — fill the list with `count` copies
+   *
+   * This method clears the list then populates it according to the chosen
+   * overload.
+   */
   public assign(arg1: number | T[], arg2?: T | number, arg3?: number): void {
     // Case: assign(values: T[], start?: number, end?: number)
     if (Array.isArray(arg1)) {
@@ -293,6 +434,13 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     throw new TypeError('Invalid arguments passed to assign()')
   }
 
+  /**
+   * Iterate the list and call `callback` for every element. If callback
+   * returns `false` iteration stops early.
+   *
+   * @param callback - function called with `(value, index, list)`
+   * @param thisArg - optional `this` binding for the callback
+   */
   public forEach(
     callback: (value: T, index: number, list: LinkedList<T, A>) => void | false,
     thisArg?: unknown,
@@ -310,6 +458,11 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     }
   }
 
+  /**
+   * Reverse the list in-place.
+   *
+   * Complexity: O(n). Safe for empty and single-element lists.
+   */
   public reverse(): void {
     if (this.length <= 1) return
 
@@ -333,6 +486,13 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     this.#head = prev
   }
 
+  /**
+   * Remove all elements that match `val` according to `compareFn`.
+   *
+   * @param val - value to match
+   * @param compareFn - equality comparison (default strict equality)
+   * @returns number of removed elements
+   */
   public remove(
     val: T,
     compareFn: (currValue: T, constValue: T) => boolean = (a, b) => a === b,
@@ -418,6 +578,12 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     list1: LinkedList<U, V> | null,
     list2: LinkedList<U, V> | null,
   ): void {
+    /**
+     * Swap the contents of two linked lists in O(1) by swapping internal
+     * pointers and lengths.
+     *
+     * @throws TypeError when either argument is not a `LinkedList`.
+     */
     if (!(list1 instanceof LinkedList && list2 instanceof LinkedList)) {
       throw new TypeError('Both arguments must be instances of LinkedList')
     }
@@ -439,6 +605,17 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     source: LinkedList<U, V> | null,
     compareFn: (a: U, b: U) => number = (a, b) => (a < b ? -1 : a > b ? 1 : 0),
   ): void {
+    /**
+     * Merge `source` into `target`. Both lists must be sorted according to
+     * `compareFn`. After the operation `source` will be empty and `target`
+     * will contain the merged sorted sequence.
+     *
+     * This operates in-place by relinking nodes and performs O(n) work.
+     *
+     * @throws TypeError when inputs are not `LinkedList` instances or
+     *   `compareFn` is not a function.
+     * @throws Error when attempting to merge a list with itself.
+     */
     if (!(target instanceof LinkedList && source instanceof LinkedList)) {
       throw new TypeError('Both arguments must be instances of LinkedList')
     }
@@ -503,6 +680,15 @@ export class LinkedList<T, A extends unknown[] = unknown[]> {
     head: ListNode<T> | null
     tail: ListNode<T> | null
   } {
+    /**
+     * Build a pair of head/tail nodes from an array of values. This helper
+     * is useful when constructing lists from pre-existing arrays.
+     *
+     * @param values - array of values to convert into a linked node chain
+     * @returns an object containing `head` and `tail` nodes (or nulls for
+     *   an empty input)
+     * @throws TypeError when `values` is not an array
+     */
     if (!Array.isArray(values)) {
       throw new TypeError('Expected an array of values')
     }
