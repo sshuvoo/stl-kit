@@ -7,7 +7,7 @@ interface ListOptions<T, A extends unknown[]> {
   factory?: Factory<T, A>
 }
 
-export class LinkedList<T, A extends unknown[] = [T]> {
+export class LinkedList<T, A extends unknown[] = unknown[]> {
   #head: ListNode<T> | null
   #tail: ListNode<T> | null
   #length: number
@@ -16,7 +16,15 @@ export class LinkedList<T, A extends unknown[] = [T]> {
     this.#head = this.#tail = null
     this.#length = 0
     this.#factory = factory
-    this.#initializeFrom(initValues)
+
+    if (initValues !== undefined && !Array.isArray(initValues)) {
+      throw new TypeError('Expected an array to initialize the list.')
+    }
+    if (initValues != undefined) {
+      for (const value of initValues) {
+        this.pushBack(value)
+      }
+    }
   }
 
   // Iterable
@@ -38,21 +46,6 @@ export class LinkedList<T, A extends unknown[] = [T]> {
 
   begin(): IterableIterator<T> {
     return this[Symbol.iterator]()
-  }
-
-  // Private method
-  #initializeFrom(initValues?: T[]): void {
-    if (initValues === undefined) return
-
-    if (!Array.isArray(initValues)) {
-      throw new TypeError('Expected an array to initialize the list.')
-    }
-
-    if (initValues.length === 0) return
-
-    for (const value of initValues) {
-      this.pushBack(value)
-    }
   }
 
   #unlink(node: ListNode<T>): T {
@@ -100,51 +93,55 @@ export class LinkedList<T, A extends unknown[] = [T]> {
     this.#length++
   }
 
-  public popFront(): T | undefined {
+  public popFront(): T {
     // No node
-    if (this.isEmpty()) return
+    if (this.isEmpty()) {
+      throw new Error('popFront: Cannot pop from an empty linked list')
+    }
 
-    const removedNode = this.#head!
-    const removedValue = removedNode.val
+    const peek = this.#head!
+    const peekVal = peek.val
 
     // Single Node
     if (this.#length === 1) {
       this.#head = this.#tail = null
-      removedNode.cleanup()
+      peek.cleanup()
       this.#length--
-      return removedValue
+      return peekVal
     }
 
     // Two and more nodes
     this.#head = this.#head!.next!
     this.#head.prev = null
-    removedNode.cleanup()
+    peek.cleanup()
     this.#length--
-    return removedValue
+    return peekVal
   }
 
-  public popBack(): T | undefined {
+  public popBack(): T {
     // No Node
-    if (this.isEmpty()) return
+    if (this.isEmpty()) {
+      throw new Error('popBack: Cannot pop from an empty linked list')
+    }
 
-    const removedNode = this.#tail!
-    const removedValue = removedNode.val
+    const peek = this.#tail!
+    const peekVal = peek.val
 
     // Single node case
     if (this.#length === 1) {
       this.#head = this.#tail = null
-      removedNode.cleanup()
+      peek.cleanup()
       this.#length--
-      return removedValue
+      return peekVal
     }
 
     // Two or more case
     const prevNode = this.#tail!.prev!
     prevNode.next = null
     this.#tail = prevNode
-    removedNode.cleanup()
+    peek.cleanup()
     this.#length--
-    return removedValue
+    return peekVal
   }
 
   public insertAt(val: T, index: number): void {
@@ -180,8 +177,10 @@ export class LinkedList<T, A extends unknown[] = [T]> {
     this.#length++
   }
 
-  public eraseAt(index: number): T | undefined {
-    if (this.isEmpty()) return
+  public eraseAt(index: number): T {
+    if (this.isEmpty()) {
+      throw new Error('eraseAt: Cannot erase from an empty linked list')
+    }
 
     if (index < 0 || index >= this.#length) {
       throw new RangeError('Invalid index to erase')
@@ -205,31 +204,32 @@ export class LinkedList<T, A extends unknown[] = [T]> {
   }
 
   public emplaceFront(...args: A): void {
-    if (typeof this.#factory === 'function') {
-      this.pushFront(this.#factory(...args))
-      return
+    if (typeof this.#factory !== 'function') {
+      throw new Error('emplaceFront: Factory function is not defined')
     }
-    this.pushFront(args[0] as T)
+    this.pushFront(this.#factory(...args))
   }
 
   public emplaceBack(...args: A): void {
-    if (typeof this.#factory === 'function') {
-      this.pushBack(this.#factory(...args))
-      return
+    if (typeof this.#factory !== 'function') {
+      throw new Error('emplaceBack: Factory function is not defined')
     }
-    this.pushBack(args[0] as T)
+    this.pushBack(this.#factory(...args))
   }
 
   public emplaceAt(index: number, ...args: A): void {
-    if (typeof this.#factory === 'function') {
-      this.insertAt(this.#factory(...args), index)
-      return
+    if (typeof this.#factory !== 'function') {
+      throw new Error('emplaceAt: Factory function is not defined')
     }
-    this.insertAt(args[0] as T, index)
+    this.insertAt(this.#factory(...args), index)
   }
 
   public isEmpty(): boolean {
     return this.#length === 0
+  }
+
+  public size(): number {
+    return this.#length
   }
 
   public clear(): void {
@@ -315,10 +315,9 @@ export class LinkedList<T, A extends unknown[] = [T]> {
 
     let prev: ListNode<T> | null = null
     let curr: ListNode<T> | null = this.#head
-    let next: ListNode<T> | null = null
 
     while (curr != null) {
-      next = curr.next
+      const next = curr.next
 
       // Swap next and prev pointers
       curr.next = prev
@@ -377,45 +376,40 @@ export class LinkedList<T, A extends unknown[] = [T]> {
     return count
   }
 
-  // public unique(compareFn: (a: T, b: T) => boolean = (a, b) => a === b): void {
-  //   if (this.#length <= 1) return
-
-  //   let current = this.#head!.next
-  //   let currVal = this.#head!.val
-
-  //   while (current !== null) {
-  //     const next = current.next
-  //     if (compareFn(currVal, current.val)) {
-  //       this.#unlink(current)
-  //     } else {
-  //       currVal = current.val
-  //     }
-  //     current = next
-  //   }
-  // }
-
   // Setter & Getter method
   public get length(): number {
     return this.#length
   }
 
-  public get front(): T | undefined {
-    if (this.isEmpty()) return
+  public get front(): T {
+    if (this.isEmpty()) {
+      throw new Error(
+        'front: cannot access front element of an empty linked list',
+      )
+    }
     return this.#head!.val
   }
 
   public set front(val: T) {
-    if (this.isEmpty()) return
+    if (this.isEmpty()) {
+      throw new Error('front: cannot set front element of an empty linked list')
+    }
     this.#head!.val = val
   }
 
-  public get back(): T | void {
-    if (this.isEmpty()) return
+  public get back(): T {
+    if (this.isEmpty()) {
+      throw new Error(
+        'back: cannot access back element of an empty linked list',
+      )
+    }
     return this.#tail!.val
   }
 
   public set back(val: T) {
-    if (this.isEmpty()) return
+    if (this.isEmpty()) {
+      throw new Error('back: cannot set back element of an empty linked list')
+    }
     this.#tail!.val = val
   }
 
