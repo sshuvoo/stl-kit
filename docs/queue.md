@@ -1,260 +1,463 @@
 # Queue
 
-A classic, robust and developer-friendly **Queue** (FIFO) data structure implemented in TypeScript using a **doubly linked list** internally. Designed for flexibility, extensibility, and performance with support for `emplace`, `clone`, STL-style iterators, and more.
+This document explains what a Queue is, why and when you would use one,
+how the `Queue` in this repository is implemented, and how to use its
+public API. It includes detailed examples, edge cases to watch for, and
+an API reference table for quick lookup. The goal is to be clear for
+beginners while also useful for experienced developers.
 
 ---
 
-## 🚀 Quick Start
+## 1) What is a Queue?
+
+A queue is a simple data structure that follows FIFO (First-In, First-Out).
+Items are added to the back (tail) and removed from the front (head). It is
+useful when order matters and you want the earliest inserted item to be
+processed first.
+
+Real-life examples:
+
+- A line at a ticket counter—first person in line is the first served.
+- Task scheduling where jobs are processed in arrival order.
+- Breadth-first traversal of graphs.
+
+Why use a Queue?
+
+- You need predictable, ordered processing of tasks or events.
+- You want simple push/pop semantics with O(1) operations for adding and
+  removing at the ends.
+
+When not to use it:
+
+- If you need random access by index or frequent mid-list insertion by
+  position, prefer an array or `Vector`.
+
+---
+
+## 2) How this `Queue` is implemented
+
+File: `src/structures/queue.ts`
+
+Key implementation details:
+
+- The `Queue` is backed by a doubly-linked list using `ListNode` nodes.
+  This gives O(1) push/pop at the ends and stable node references.
+- The class keeps private `#head`, `#tail`, and `#length` fields.
+- There is optional `factory` support used by `emplace(...)` to construct
+  elements in-place.
+- The implementation throws clear errors for invalid usage (for example
+  attempting to `pop()` or `peek()` on an empty queue — see special note
+  below for why we have both `front` and `peek`).
+
+Complexity summary:
+
+- `push`, `pop`, `peek` (when defined) — O(1)
+- `toArray`, `forEach`, `clear`, `clone` — O(n)
+- `assign` — O(n)
+
+---
+
+## 3) Design choices and special notes
+
+Two small API design decisions were made intentionally and are important
+for users to understand:
+
+1. `front` getter vs `peek()` method
+
+- `front` is a JS-friendly getter that returns the value at the head, or
+  `undefined` when the queue is empty. This is convenient when you prefer
+  JavaScript idioms and want a non-throwing inspection.
+- `peek()` is a method that intentionally throws an `Error` when the queue
+  is empty. This follows an STL-like, explicit-failure pattern: calling
+  `peek()` on empty queues is likely a bug, so the method fails loudly.
+
+Why both?
+
+- We keep both to support two mental models:
+  - JavaScript developers often expect property accessors to return
+    `undefined` when absent and to avoid exceptions.
+  - Developers familiar with STL (C++) expect `peek()`/`top()` to throw
+    or be undefined behaviour on empty containers; explicit errors help
+    catch bugs earlier.
+
+Choose the one that fits your code style. If you want a safe check use
+`front` or `isEmpty()` before `peek()`.
+
+2. `size()` method vs `length` getter
+
+- `size()` mirrors STL naming and may be preferred by developers coming
+  from languages that use `size()` (C++, Java).
+- `length` is the JavaScript-friendly property so array-minded developers
+  can use a familiar name.
+
+Both return the same number and are kept for ergonomics only.
+
+---
+
+## 4) Public API — detailed explanations with examples
+
+Each public method and important behaviour is explained with complexity,
+edge cases, and examples.
+
+### Constructor
+
+Signature:
+
+- `new Queue<T, A extends unknown[] = unknown[]>({ initValues?, factory? } = {})`
+
+What it does:
+
+- Create a new `Queue`. Optionally initialize with `initValues` (an
+  array) which will be pushed to the queue in order. Optionally provide a
+  `factory` used by `emplace(...args)`.
+
+Complexity: O(n) when `initValues` is provided (push each element), O(1)
+otherwise.
+
+Edge cases:
+
+- Passing `initValues` that is not an array throws `TypeError`.
+
+Example:
 
 ```ts
 import { Queue } from 'stl-kit'
 
-const queue = new Queue<number>()
-queue.push(10)
-queue.push(20)
-console.log(queue.pop()) // 10
-```
+const q = new Queue<number>()
+const q2 = new Queue({ initValues: [1, 2, 3] })
 
----
-
-## 🏗️ Constructor
-
-```ts
-new Queue<T, A>(options?: {
-  initValues?: T[]
-  factory?: (...args: A) => T
+class Point {
+  constructor(public x: number, public y: number) {}
+}
+const qf = new Queue<Point, [number, number]>({
+  factory: (a, b) => new Point(a, b),
 })
-```
-
-- `initValues`: Optional array of values to prefill the queue.
-- `factory`: Optional factory for use with `emplace()`.
-
----
-
-## 📚 Instance Methods
-
-### `push(value: T): void`
-
-Adds a value to the back of the queue.
-
-```ts
-queue.push(42)
-```
-
----
-
-### `pop(): T | undefined`
-
-Removes and returns the front value. Returns `undefined` if empty.
-
-```ts
-const val = queue.pop()
-```
-
----
-
-### `peek(): T | undefined`
-
-Returns the front value without removing it.
-
-```ts
-queue.peek()
-```
-
----
-
-### `emplace(...args: A): void`
-
-Constructs and pushes a value using the provided factory.
-
-```ts
-const queue = new Queue<Person, [string, number]>({
-  factory: (name, age) => new Person(name, age),
+// For better type inference (Recommended)
+const qf = new Queue({
+  factory: (a: number, b: number) => new Point(a, b),
 })
-queue.emplace('Alice', 30)
+qf.emplace(2, 3) // pushed Point { x: 2, y: 3 }
 ```
 
 ---
 
-### `assign(count: number, value: T): void`
+### Iteration and reversed
 
-Fills the queue with `count` copies of `value`.
+- `for (const v of queue)` iterates from front (head) to back (tail).
+- `queue.reversed` is a getter that returns an iterator yielding values
+  from tail to head.
+
+Example:
 
 ```ts
-queue.assign(3, 99) // [99, 99, 99]
+for (const v of q2) {
+  console.log(v)
+}
+console.log([...q2.reversed])
 ```
 
 ---
 
-### `assign(values: T[], start?: number, end?: number): void`
+### push(value)
 
-Fills the queue with a slice of `values`.
+What it does:
+
+- Add `value` to the back (tail) of the queue.
+
+Complexity: O(1)
+
+Example:
 
 ```ts
-queue.assign([1, 2, 3, 4], 1, 3) // [2, 3]
+q.push('a')
+q.push('b')
 ```
 
 ---
 
-### `clone(deepCloneFn?: (val: T) => T): Queue<T, A>`
+### pop()
 
-Returns a deep copy of the queue. Defaults to `structuredClone`.
+What it does:
+
+- Remove and return the value at the front (head) of the queue.
+
+Complexity: O(1)
+
+Edge cases:
+
+- `pop()` throws an `Error` when the queue is empty. This makes invalid
+  pops explicit and prevents silent bugs.
+
+Example:
 
 ```ts
-const deep = queue.clone()
-const shallow = queue.clone((v) => v)
+const x = q.pop()
 ```
 
 ---
 
-### `clear(): void`
+### emplace(...args)
 
-Removes all elements.
+What it does:
+
+- Construct a new element using the `factory` provided at construction and
+  push it into the queue.
+
+Complexity: O(1) plus factory cost.
+
+Edge cases:
+
+- Throws `TypeError` if no `factory` was provided.
+
+Example:
 
 ```ts
-queue.clear()
+interface Area {
+  width: number
+  height: number
+  area: number
+}
+const f = new Queue<Area, [number, number]>({
+  factory: (width, height) => {
+    return { width, height, area: width * height }
+  }
+})
+// For better type inference (Recommended)
+const f = new Queue({
+  factory: (width: number, height: number) => {
+    return { width, height, area: width * height } as Area
+  }
+})
+f.emplace(5, 10) // pushes { width: 5, height: 10, area: 50 }
 ```
 
 ---
 
-### `toArray(): T[]`
+### peek()
 
-Returns a shallow copy of the queue as an array.
+What it does:
+
+- Return the value at the front without removing it.
+
+Complexity: O(1)
+
+Edge cases:
+
+- Throws an `Error` when the queue is empty. Prefer `front` if you want
+  a non-throwing inspection.
+
+Example:
 
 ```ts
-const arr = queue.toArray()
+if (!q.isEmpty()) {
+  console.log(q.peek())
+}
 ```
 
 ---
 
-### `forEach(cb, thisArg?)`
+### front getter
 
-Iterates through the queue from front to back.
+What it does:
+
+- Return the value at the front or `undefined` when the queue is empty.
+
+Complexity: O(1)
+
+Example:
 
 ```ts
-queue.forEach((val, i) => console.log(val, i))
+console.log(q.front) // may be undefined when empty
 ```
 
 ---
 
-### `begin(): IterableIterator<T>`
+### isEmpty(), size(), length, clear(), toArray()
 
-Returns a forward iterator (default direction).
+- `isEmpty()` — true if the queue has no elements.
+- `size()` — returns the number of elements (STL-style).
+- `length` — getter alias for `size()` (JS-style).
+- `clear()` — remove all elements (O(n) to cleanup nodes).
+- `toArray()` — return a shallow array copy of the queue (front -> back).
+
+Example:
 
 ```ts
-for (const val of queue.begin()) { ... }
+console.log(q.size(), q.length, q.isEmpty())
+q.clear()
+console.log(q.toArray())
 ```
 
 ---
 
-### `rbegin(): IterableIterator<T>`
+### toArray() and iteration notes
 
-Returns a reverse iterator (from back to front).
+- `toArray()` and iteration return values in queue order (front -> back).
+- These are shallow copies; mutating returned objects affects stored
+  elements if they are reference types.
+
+---
+
+### assign(values|count, ...)
+
+Overloads:
+
+- `assign(values: T[], start?: number, end?: number)` — copy slice of an
+  array into the queue
+- `assign(count: number, value: T)` — fill the queue with `count` copies
+  of `value`
+
+Both clear the queue first.
+
+Example:
 
 ```ts
-for (const val of queue.rbegin()) { ... }
+q.assign([1, 2, 3])
+q.assign(3, 'x')
 ```
 
 ---
 
-## 🧾 Properties
+### forEach(callback, thisArg?)
 
-### `length: number`
+What it does:
 
-Current number of elements in the queue.
+- Call `callback(value, index, queue)` for each element. If `callback`
+  returns `false`, iteration stops early.
 
-### `front: T | undefined`
+Edge cases:
 
-Getter/setter for the front value.
+- Throws `TypeError` when `callback` is not a function.
+
+Example:
 
 ```ts
-queue.front = 99
-const val = queue.front
+q.forEach((v) => console.log(v))
 ```
 
-### `back: T | undefined`
+---
 
-Getter/setter for the back value.
+### clone(deepCloneFn?)
+
+What it does:
+
+- Return a shallow copy of the queue. By default it uses `structuredClone`
+  if available; otherwise a custom `deepCloneFn` must be provided.
+
+Complexity: O(n)
+
+Example:
 
 ```ts
-queue.back = 42
-const val = queue.back
+const copy = q.clone()
 ```
 
 ---
 
-## 🧰 Static Methods
+### Static helpers: equals(queue1, queue2), swap(queue1, queue2)
 
-### `Queue.equals(queue1, queue2, comparator?): boolean`
+- `equals` compares two queues element-by-element using a comparator
+  function (defaults to `===`). Throws if inputs are not `Queue` instances.
+- `swap` exchanges internal pointers and lengths in O(1) — useful for
+  efficient swaps without copying.
 
-Checks equality of two queues. Optionally pass a comparator.
+Example:
 
 ```ts
-Queue.equals(queueA, queueB)
+Queue.equals(q, other)
+Queue.swap(q, other)
 ```
 
 ---
 
-### `Queue.swap(queue1, queue2): void`
+## 5) Examples and patterns
 
-Swaps contents of two queues (must use same factory).
+### Basic FIFO usage
 
 ```ts
-Queue.swap(queue1, queue2)
+const q = new Queue<number>()
+q.push(1)
+q.push(2)
+console.log(q.pop()) // 1
+console.log(q.pop()) // 2
+```
+
+### `front` vs `peek` pattern
+
+```ts
+const q = new Queue<number>()
+if (q.front !== undefined) {
+  // safe, non-throwing access
+  console.log(q.front)
+}
+
+// or, if you prefer explicit errors:
+try {
+  console.log(q.peek())
+} catch (err) {
+  console.error('empty queue')
+}
+```
+
+### Using `clone` for safe mutable operations
+
+If you want to examine or sort queue contents without mutating the
+original, clone and operate on the copy:
+
+```ts
+const copy = q.clone()
+const items = copy.toArray()
 ```
 
 ---
 
-## ⚠️ Error Handling
+## 6) Edge cases and best practices
 
-- `front = val`/`back = val` throws if queue is empty.
-- `assign()` throws if invalid range or arguments.
-- `clone()` throws if `structuredClone` not available and no fallback provided.
-
----
-
-## 🧠 Performance
-
-| Operation  | Time Complexity |
-| ---------- | --------------- |
-| push / pop | O(1)            |
-| assign     | O(n)            |
-| clone      | O(n)            |
-| toArray    | O(n)            |
+- Use `isEmpty()` before `pop()` or `peek()` if you want to avoid exceptions.
+- Use `front` when you prefer a non-throwing, idiomatic JS accessor.
+- Use `size()` or `length` interchangeably — both return the same value.
+- When constructing queues from large arrays, prefer `assign(values)` or
+  the `initValues` constructor option to avoid repeated reallocation costs.
+- `clear()` frees nodes via their `cleanup()` helper; ensure that cleanup
+  side effects (if any) are acceptable.
 
 ---
 
-## 💡 Compatibility
+## 7) API Reference Table (quick sight)
 
-- Requires ES2022+ (`#private fields` and optional `structuredClone`)
-- If using in Node.js < 18, provide a polyfill or custom `deepCloneFn`
-
----
-
-## 📘 API Reference
-
-| Method / Property | Signature                                           | Description                        |
-| ----------------- | --------------------------------------------------- | ---------------------------------- |
-| `push`            | `(value: T): void`                                  | Push a value to the back           |
-| `pop`             | `(): T \| undefined`                                | Pop the front value from the queue |
-| `peek`       | `(): T \| undefined`                                | Return the front value             |
-| `emplace`         | `(...args: A): void`                                | Push using a factory               |
-| `assign` (count)  | `(count: number, value: T): void`                   | Fill queue with repeated value     |
-| `assign` (slice)  | `(values: T[], start?: number, end?: number): void` | Fill queue with slice of array     |
-| `clone`           | `(deepCloneFn?): Queue<T, A>`                       | Clone the queue                    |
-| `clear`           | `(): void`                                          | Empty the queue                    |
-| `toArray`         | `(): T[]`                                           | Convert to array                   |
-| `forEach`         | `(cb, thisArg?): void`                              | Loop through elements              |
-| `begin`           | `(): IterableIterator<T>`                           | Forward iterator                   |
-| `rbegin`          | `(): IterableIterator<T>`                           | Reverse iterator                   |
-| `length`          | `number`                                            | Number of elements                 |
-| `front`           | `T \| undefined` (getter/setter)                    | Get/set front value                |
-| `back`            | `T \| undefined` (getter/setter)                    | Get/set back value                 |
-| `Queue.equals`    | `(queue1, queue2, comparator?): boolean`            | Compare two queues                 |
-| `Queue.swap`      | `(queue1, queue2): void`                            | Swap contents of two queues        |
+| Name        | Signature                            | Description                                   | Complexity                |
+| ----------- | ------------------------------------ | --------------------------------------------- | ------------------------- |
+| Constructor | `new Queue(options?)`                | Create queue; accepts `initValues`, `factory` | O(n) w/ init              |
+| push        | `push(value: T)`                     | Insert at tail                                | O(1)                      |
+| pop         | `pop(): T`                           | Remove and return head (throws if empty)      | O(1)                      |
+| emplace     | `emplace(...args: A)`                | Build using factory and push                  | O(1)+cost                 |
+| peek        | `peek(): T`                          | Inspect head (throws if empty)                | O(1)                      |
+| front       | `get front(): T \| undefined`        | Inspect head non-throwing                     | O(1)                      |
+| isEmpty     | `isEmpty(): boolean`                 | True when empty                               | O(1)                      |
+| clear       | `clear(): void`                      | Remove all elements                           | O(n)                      |
+| toArray     | `toArray(): T[]`                     | Array copy (front -> back)                    | O(n)                      |
+| assign      | `assign(...args)`                    | Replace contents                              | O(n)                      |
+| forEach     | `forEach(callback)`                  | Iterate with early-stop support               | O(n)                      |
+| clone       | `clone(deepCloneFn?)`                | Create deep/shallow copy                      | O(n)                      |
+| size        | `size(): number`                     | Number of elements                            | O(1)                      |
+| length      | `get length(): number`               | Alias for `size()`                            | O(1)                      |
+| reversed    | `get reversed(): IterableIterator`   | Reverse iterator (tail -> head)               | O(n)                      |
+| equals      | `static equals(q1, q2, comparator?)` | Compare two queues                            | O(n)                      |
+| swap        | `static swap(q1, q2)`                | O(1) swap internal pointers                   | O(1)                      |
 
 ---
 
-## 📎 License & Contributions
+## 8) Notes, limitations and contribution request
 
-This package is open-source under the MIT License. Feel free to submit issues or pull requests on GitHub.
+- This `Queue` focuses on clear semantics and beginner-friendly behaviour.
+- We intentionally expose both non-throwing (`front`) and throwing
+  (`peek`) accessors for ergonomic and defensive styles, respectively.
+- If you discover a bug or have ideas for additional helpers, please open an issue or submit a
+  pull request with tests and examples.
+
+Thank you for reading — contributions and questions are welcome!
+
+---
+
+_Created from code in `src/structures/queue.ts`. If you update the
+implementation, consider updating this documentation accordingly._
