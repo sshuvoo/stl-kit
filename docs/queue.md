@@ -123,20 +123,32 @@ Example:
 ```ts
 import { Queue } from 'stl-kit'
 
-const q = new Queue<number>()
+const q1 = new Queue<number>()
 const q2 = new Queue({ initValues: [1, 2, 3] })
 
-class Point {
-  constructor(public x: number, public y: number) {}
+// Example with factory
+class Rectangle {
+  width: number
+  height: number
+  area: number
+  constructor(width: number, height: number) {
+    this.width = width
+    this.height = height
+    this.area = width * height
+  }
 }
-const qf = new Queue<Point, [number, number]>({
-  factory: (a, b) => new Point(a, b),
+
+type FactoryParams = [width: number, height: number]
+
+const q3 = new Queue<Rectangle, FactoryParams>({
+  factory: (w, h) => new Rectangle(w, h), // w and h are inferred from FactoryParams
 })
-// For better type inference (Recommended)
-const qf = new Queue({
-  factory: (a: number, b: number) => new Point(a, b),
+
+// Alternative way to infer types
+const q3 = new Queue({
+  factory: (w: number, h: number) => new Rectangle(w, h),
 })
-qf.emplace(2, 3) // pushed Point { x: 2, y: 3 }
+q3.emplace(2, 3) // pushed Rectangle { width: 2, height: 3, area: 6 }
 ```
 
 ---
@@ -150,10 +162,14 @@ qf.emplace(2, 3) // pushed Point { x: 2, y: 3 }
 Example:
 
 ```ts
-for (const v of q2) {
-  console.log(v)
+const queue = new Queue({ initValues: [1, 2, 3] })
+for (const value of queue) {
+  console.log(value) // 1 -> 2 -> 3
 }
-console.log([...q2.reversed])
+// reverse iteration
+for (const value of queue.reversed) {
+  console.log(value) // 3 -> 2 -> 1
+}
 ```
 
 ---
@@ -169,8 +185,9 @@ Complexity: O(1)
 Example:
 
 ```ts
-q.push('a')
-q.push('b')
+const q = new Queue<string>()
+q.push('a') // ["a"]
+q.push('b') // ["a", "b"]
 ```
 
 ---
@@ -191,7 +208,10 @@ Edge cases:
 Example:
 
 ```ts
-const x = q.pop()
+const q = new Queue({ initValues: ['a', 'b'] })
+console.log(q.pop()) // "a"
+console.log(q.pop()) // "b"
+console.log(q.pop()) // Error: Queue is empty
 ```
 
 ---
@@ -212,23 +232,22 @@ Edge cases:
 Example:
 
 ```ts
-interface Area {
-  width: number
-  height: number
-  area: number
+interface Point {
+  x: number
+  y: number
 }
-const f = new Queue<Area, [number, number]>({
-  factory: (width, height) => {
-    return { width, height, area: width * height }
-  }
+
+type FactoryParams = [x: number, y: number]
+
+const q = new Queue<Point, FactoryParams>({
+  factory: (x, y) => ({ x, y }),
 })
-// For better type inference (Recommended)
-const f = new Queue({
-  factory: (width: number, height: number) => {
-    return { width, height, area: width * height } as Area
-  }
+
+// Alternative way to infer types
+const q = new Queue({
+  factory: (x: number, y: number) => ({ x, y }) as Point,
 })
-f.emplace(5, 10) // pushes { width: 5, height: 10, area: 50 }
+q.emplace(5, 10) // pushes Point { x: 5, y: 10 }
 ```
 
 ---
@@ -249,9 +268,11 @@ Edge cases:
 Example:
 
 ```ts
-if (!q.isEmpty()) {
-  console.log(q.peek())
-}
+const q = new Queue({ initValues: ['a', 'b'] })
+console.log(q.peek()) // "a"
+console.log(q.pop()) // "a" where q = ["b"]
+console.log(q.pop()) // "b" where q = []
+console.log(q.peek()) // Error: Queue is empty
 ```
 
 ---
@@ -267,7 +288,11 @@ Complexity: O(1)
 Example:
 
 ```ts
-console.log(q.front) // may be undefined when empty
+const q = new Queue({ initValues: ['Support', 'Palestine'] })
+console.log(q.front) // "Support"
+console.log(q.pop()) // "Support"  where q = ["Palestine"]
+console.log(q.pop()) // "Palestine" where q = []
+console.log(q.front) // undefined
 ```
 
 ---
@@ -283,9 +308,13 @@ console.log(q.front) // may be undefined when empty
 Example:
 
 ```ts
-console.log(q.size(), q.length, q.isEmpty())
-q.clear()
-console.log(q.toArray())
+const q = new Queue({ initValues: [1, 2, 3] })
+console.log(q.size()) // 3
+console.log(q.length) // 3
+console.log(q.isEmpty()) // false
+console.log(q.toArray()) // [1, 2, 3]
+q.clear() // remove all elements
+console.log([...q]) // []
 ```
 
 ---
@@ -312,8 +341,10 @@ Both clear the queue first.
 Example:
 
 ```ts
-q.assign([1, 2, 3])
-q.assign(3, 'x')
+const q = new Queue<number>()
+q.assign([1, 2, 3, 4, 5]) // [1, 2, 3, 4, 5]
+q.assign([1, 2, 3, 5, 7], 1, 4) // slice [2, 3, 5]
+q.assign(3, 100) // [100, 100, 100]
 ```
 
 ---
@@ -332,7 +363,8 @@ Edge cases:
 Example:
 
 ```ts
-q.forEach((v) => console.log(v))
+const q = new Queue({ initValues: ['a', 'b', 'c'] })
+q.forEach((v) => console.log(v)) // iterates from front to back
 ```
 
 ---
@@ -350,6 +382,7 @@ Example:
 
 ```ts
 const copy = q.clone()
+// you can provide a custom deepCloneFn
 ```
 
 ---
@@ -364,8 +397,11 @@ const copy = q.clone()
 Example:
 
 ```ts
-Queue.equals(q, other)
-Queue.swap(q, other)
+const q1 = new Queue({ initValues: [1, 2, 3] })
+const q2 = new Queue({ initValues: [4, 5, 6] })
+
+Queue.equals(q1, q2) // false
+Queue.swap(q1, q2) // q1 = [4, 5, 6], q2 = [1, 2, 3]
 ```
 
 ---
@@ -375,27 +411,27 @@ Queue.swap(q, other)
 ### Basic FIFO usage
 
 ```ts
-const q = new Queue<number>()
-q.push(1)
-q.push(2)
-console.log(q.pop()) // 1
-console.log(q.pop()) // 2
+// Count the number of even elements 
+const q = new Queue<number>({ initValues: [1, 2, 3, 4, 5, 6] })
+let count = 0
+while (!q.isEmpty()) {
+  if (q.pop() % 2 === 0) {
+    count++
+  }
+}
+console.log(count) // 3
 ```
 
 ### `front` vs `peek` pattern
 
 ```ts
 const q = new Queue<number>()
-if (q.front !== undefined) {
-  // safe, non-throwing access
-  console.log(q.front)
-}
-
-// or, if you prefer explicit errors:
-try {
-  console.log(q.peek())
-} catch (err) {
-  console.error('empty queue')
+// safe, non-throwing access
+console.log(q.front) // undefined
+q.push(3)
+// or check if not empty
+if (!q.isEmpty()) {
+  console.log(q.peek()) // 3
 }
 ```
 
@@ -405,8 +441,10 @@ If you want to examine or sort queue contents without mutating the
 original, clone and operate on the copy:
 
 ```ts
-const copy = q.clone()
-const items = copy.toArray()
+const q = new Queue({ initValues: [1, 2, 3] })
+const copy = q.clone() 
+const items = copy.toArray() // copied [1, 2, 3]
+Queue.equals(q, copy) // true (for primitive values)
 ```
 
 ---
@@ -425,25 +463,25 @@ const items = copy.toArray()
 
 ## 7) API Reference Table (quick sight)
 
-| Name        | Signature                            | Description                                   | Complexity                |
-| ----------- | ------------------------------------ | --------------------------------------------- | ------------------------- |
-| Constructor | `new Queue(options?)`                | Create queue; accepts `initValues`, `factory` | O(n) w/ init              |
-| push        | `push(value: T)`                     | Insert at tail                                | O(1)                      |
-| pop         | `pop(): T`                           | Remove and return head (throws if empty)      | O(1)                      |
-| emplace     | `emplace(...args: A)`                | Build using factory and push                  | O(1)+cost                 |
-| peek        | `peek(): T`                          | Inspect head (throws if empty)                | O(1)                      |
-| front       | `get front(): T \| undefined`        | Inspect head non-throwing                     | O(1)                      |
-| isEmpty     | `isEmpty(): boolean`                 | True when empty                               | O(1)                      |
-| clear       | `clear(): void`                      | Remove all elements                           | O(n)                      |
-| toArray     | `toArray(): T[]`                     | Array copy (front -> back)                    | O(n)                      |
-| assign      | `assign(...args)`                    | Replace contents                              | O(n)                      |
-| forEach     | `forEach(callback)`                  | Iterate with early-stop support               | O(n)                      |
-| clone       | `clone(deepCloneFn?)`                | Create deep/shallow copy                      | O(n)                      |
-| size        | `size(): number`                     | Number of elements                            | O(1)                      |
-| length      | `get length(): number`               | Alias for `size()`                            | O(1)                      |
-| reversed    | `get reversed(): IterableIterator`   | Reverse iterator (tail -> head)               | O(n)                      |
-| equals      | `static equals(q1, q2, comparator?)` | Compare two queues                            | O(n)                      |
-| swap        | `static swap(q1, q2)`                | O(1) swap internal pointers                   | O(1)                      |
+| Name        | Signature                            | Description                                   | Complexity       |
+| ----------- | ------------------------------------ | --------------------------------------------- | ---------------- |
+| Constructor | `new Queue(options?)`                | Create queue; accepts `initValues`, `factory` | O(n) w/ init     |
+| push        | `push(value: T)`                     | Insert at tail                                | O(1)             |
+| pop         | `pop(): T`                           | Remove and return head (throws if empty)      | O(1)             |
+| emplace     | `emplace(...args: A)`                | Build using factory and push                  | O(1)+cost        |
+| peek        | `peek(): T`                          | Inspect head (throws if empty)                | O(1)             |
+| front       | `get front(): T \| undefined`        | Inspect head non-throwing                     | O(1)             |
+| isEmpty     | `isEmpty(): boolean`                 | True when empty                               | O(1)             |
+| clear       | `clear(): void`                      | Remove all elements                           | O(n)             |
+| toArray     | `toArray(): T[]`                     | Array copy (front -> back)                    | O(n)             |
+| assign      | `assign(values\|count, ...)`         | Replace contents                              | O(n)             |
+| forEach     | `forEach(callback)`                  | Iterate with early-stop support               | O(n)             |
+| clone       | `clone(deepCloneFn?)`                | Create deep/shallow copy                      | O(n)             |
+| size        | `size(): number`                     | Number of elements                            | O(1)             |
+| length      | `get length(): number`               | Alias for `size()`                            | O(1)             |
+| reversed    | `get reversed(): IterableIterator`   | Reverse iterator (tail -> head)               | O(n)             |
+| equals      | `static equals(q1, q2, comparator?)` | Compare two queues                            | O(n)             |
+| swap        | `static swap(q1, q2)`                | O(1) swap internal pointers                   | O(1)             |
 
 ---
 
