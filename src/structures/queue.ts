@@ -7,16 +7,24 @@ interface QueueOptions<T, A extends unknown[]> {
   factory?: Factory<T, A>
 }
 
-export class Queue<T, A extends unknown[] = unknown[]> {
+export class Queue<T, A extends unknown[] = unknown[]> implements Iterable<T> {
   #head: ListNode<T> | null
   #tail: ListNode<T> | null
   #length: number
   #factory?: Factory<T, A>
+
   constructor({ initValues, factory }: QueueOptions<T, A> = {}) {
     this.#head = this.#tail = null
     this.#length = 0
     this.#factory = factory
-    this.#initializeFrom(initValues)
+    if (initValues !== undefined && !Array.isArray(initValues)) {
+      throw new TypeError('Expected an array to initialize the queue.')
+    }
+    if (initValues !== undefined) {
+      for (const value of initValues) {
+        this.push(value)
+      }
+    }
   }
 
   // Iterable
@@ -28,31 +36,15 @@ export class Queue<T, A extends unknown[] = unknown[]> {
     }
   }
 
-  *rbegin(): IterableIterator<T> {
-    let current = this.#tail
-    while (current !== null) {
-      yield current.val
-      current = current.prev
+  get reversed(): IterableIterator<T> {
+    function* iterator(this: Queue<T, A>): IterableIterator<T> {
+      let current = this.#tail
+      while (current !== null) {
+        yield current.val
+        current = current.prev
+      }
     }
-  }
-
-  begin(): IterableIterator<T> {
-    return this[Symbol.iterator]()
-  }
-
-  // Private methods
-  #initializeFrom(initValues?: T[]): void {
-    if (initValues === undefined) return
-
-    if (!Array.isArray(initValues)) {
-      throw new TypeError('Expected an array to initialize the stack.')
-    }
-
-    if (initValues.length === 0) return
-
-    for (const value of initValues) {
-      this.push(value)
-    }
+    return iterator.call(this)
   }
 
   // Public method
@@ -71,32 +63,33 @@ export class Queue<T, A extends unknown[] = unknown[]> {
     this.#length++
   }
 
-  public pop(): T | undefined {
-    // No node
-    if (this.isEmpty()) return
+  public pop(): T {
+    if (this.isEmpty()) {
+      throw new Error('Cannot perform pop operation on empty queue.')
+    }
 
-    const removedNode = this.#head!
-    const removedValue = removedNode.val
+    const peek = this.#head!
+    const peekVal = peek.val
 
     // Single Node
     if (this.#length === 1) {
       this.#head = this.#tail = null
-      removedNode.cleanup()
+      peek.cleanup()
       this.#length--
-      return removedValue
+      return peekVal
     }
 
     // Two and more nodes
     this.#head = this.#head!.next
     this.#head!.prev = null
-    removedNode.cleanup()
+    peek.cleanup()
     this.#length--
-    return removedValue
+    return peekVal
   }
 
   public emplace(...args: A): void {
     if (typeof this.#factory !== 'function') {
-      throw new TypeError('Please provide a factory function to use emplace.')
+      throw new TypeError('Factory function is not defined to perform emplace.')
     }
     this.push(this.#factory(...args))
   }
@@ -188,8 +181,10 @@ export class Queue<T, A extends unknown[] = unknown[]> {
     }
   }
 
-  public peek(): T | undefined {
-    if (this.isEmpty()) return
+  public peek(): T {
+    if (this.isEmpty()) {
+      throw new Error('Cannot perform peek operation on empty queue.')
+    }
     return this.#head!.val
   }
 
@@ -213,6 +208,10 @@ export class Queue<T, A extends unknown[] = unknown[]> {
     return copy
   }
 
+  public size(): number {
+    return this.#length
+  }
+
   // Getter and Setter
   public get length(): number {
     return this.#length
@@ -221,21 +220,6 @@ export class Queue<T, A extends unknown[] = unknown[]> {
   public get front(): T | undefined {
     if (this.isEmpty()) return
     return this.#head!.val
-  }
-
-  public set front(val: T) {
-    if (this.isEmpty()) return
-    this.#head!.val = val
-  }
-
-  public get back(): T | undefined {
-    if (this.isEmpty()) return
-    return this.#tail!.val
-  }
-
-  public set back(val: T) {
-    if (this.isEmpty()) return
-    this.#tail!.val = val
   }
 
   // Static method
@@ -248,11 +232,13 @@ export class Queue<T, A extends unknown[] = unknown[]> {
       throw new TypeError('Input value must be an instance of queue')
     }
 
-    if (queue1.#factory !== queue2.#factory) {
+    if (
+      queue1.#factory !== queue2.#factory ||
+      queue1.#length !== queue2.#length
+    ) {
       return false
     }
 
-    if (queue1.#length !== queue2.#length) return false
     function backtrack(
       head1: ListNode<U> | null,
       head2: ListNode<U> | null,
