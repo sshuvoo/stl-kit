@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+# [5.4.2] - 2025-08-29
+
+### Changed
+
+- `Queue` API updated with breaking and ergonomic changes:
+  - Removed `begin()` and `rBegin()` iterable methods (BREAKING CHANGE).
+  - Introduced `reversed` getter for backward iteration (tail -> head).
+  - Removed `back` getter/setter.
+  - `peek()` behavior updated: returns `undefined` when inspecting the
+    front value on an empty queue via the `front` getter, and `peek()` now
+    throws an `Error` when the queue is empty (defensive behaviour for
+    users who prefer explicit failures).
+  - `pop()` now throws when invoked on an empty queue.
+
+### Documentation
+
+- Added comprehensive JSDoc to `src/structures/queue.ts` documenting the
+  public API with edge cases.
+
+### Breaking Changes
+
+- Removal of `begin()` and `rBegin()` iterator methods. Users should use
+  the native iterable (`for..of`, spread) and the new `reversed` getter
+  for backward traversal.
+
 # [5.4.1] - 2025-08-28
 
 ### Changed
