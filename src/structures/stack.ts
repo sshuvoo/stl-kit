@@ -7,7 +7,7 @@ interface StackOptions<T, A extends unknown[]> {
   factory?: Factory<T, A>
 }
 
-export class Stack<T, A extends unknown[] = unknown[]> {
+export class Stack<T, A extends unknown[] = unknown[]> implements Iterable<T> {
   #head: ListNode<T> | null
   #tail: ListNode<T> | null
   #length: number
@@ -16,7 +16,14 @@ export class Stack<T, A extends unknown[] = unknown[]> {
     this.#head = this.#tail = null
     this.#length = 0
     this.#factory = factory
-    this.#initializeFrom(initValues)
+    if (initValues !== undefined && !Array.isArray(initValues)) {
+      throw new TypeError('Expected an array to initialize the stack.')
+    }
+    if (initValues !== undefined) {
+      for (const value of initValues) {
+        this.push(value)
+      }
+    }
   }
 
   // Iterable
@@ -28,31 +35,15 @@ export class Stack<T, A extends unknown[] = unknown[]> {
     }
   }
 
-  *rbegin(): IterableIterator<T> {
-    let current = this.#tail
-    while (current !== null) {
-      yield current.val
-      current = current.prev
+  get reversed(): IterableIterator<T> {
+    function* iterator(this: Stack<T, A>): IterableIterator<T> {
+      let current = this.#tail
+      while (current !== null) {
+        yield current.val
+        current = current.prev
+      }
     }
-  }
-
-  begin(): IterableIterator<T> {
-    return this[Symbol.iterator]()
-  }
-
-  // Private methods
-  #initializeFrom(initValues?: T[]): void {
-    if (initValues === undefined) return
-
-    if (!Array.isArray(initValues)) {
-      throw new TypeError('Expected an array to initialize the stack.')
-    }
-
-    if (initValues.length === 0) return
-
-    for (const value of initValues) {
-      this.push(value)
-    }
+    return iterator.call(this)
   }
 
   // Public method
@@ -71,28 +62,29 @@ export class Stack<T, A extends unknown[] = unknown[]> {
     this.#length++
   }
 
-  public pop(): T | undefined {
-    // No Node
-    if (this.isEmpty()) return
+  public pop(): T {
+    if (this.isEmpty()) {
+      throw new Error('Cannot perform pop operation on empty stack.')
+    }
 
-    const removedNode = this.#tail!
-    const removedValue = removedNode.val
+    const peek = this.#tail!
+    const peekVal = peek.val
 
     // Single node case
     if (this.#length === 1) {
       this.#head = this.#tail = null
-      removedNode.cleanup()
+      peek.cleanup()
       this.#length--
-      return removedValue
+      return peekVal
     }
 
     // Two or more case
     const prevNode = this.#tail!.prev!
     prevNode.next = null
     this.#tail = prevNode
-    removedNode.cleanup()
+    peek.cleanup()
     this.#length--
-    return removedValue
+    return peekVal
   }
 
   public emplace(...args: A): void {
@@ -189,8 +181,11 @@ export class Stack<T, A extends unknown[] = unknown[]> {
     }
   }
 
-  public peek(): T | undefined {
-    return this.top
+  public peek(): T {
+    if (this.isEmpty()) {
+      throw new Error('Cannot perform peek operation on empty stack.')
+    }
+    return this.#tail!.val
   }
 
   public clone(
@@ -213,6 +208,10 @@ export class Stack<T, A extends unknown[] = unknown[]> {
     return copy
   }
 
+  public size(): number {
+    return this.#length
+  }
+
   // Getter and Setter
   public get length(): number {
     return this.#length
@@ -221,14 +220,6 @@ export class Stack<T, A extends unknown[] = unknown[]> {
   public get top(): T | undefined {
     if (this.isEmpty()) return
     return this.#tail!.val
-  }
-
-  public set top(val: T) {
-    if (this.isEmpty()) {
-      throw new Error('Cannot set top of an empty stack.')
-    }
-
-    this.#tail!.val = val
   }
 
   // Static method
