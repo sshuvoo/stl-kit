@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+# [5.4.3] - 2025-09-04
+
+### Changed
+
+- `Stack` public API: added comprehensive JSDoc to `src/structures/stack.ts`
+- `peek()` and `pop()` on `Stack` now throw a clear `Error` when the
+  stack is empty (defensive behaviour to help surface bugs).
+- Redesigned `docs/stack.md` to be more beginner-friendly and consistent
+  with other docs (examples, patterns, and API table).
+
+---
+
 # [5.4.2] - 2025-08-29
 
 ### Changed
@@ -30,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the native iterable (`for..of`, spread) and the new `reversed` getter
   for backward traversal.
 
+---
+
 # [5.4.1] - 2025-08-28
 
 ### Changed
@@ -42,6 +56,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Updated `docs/linked-list.md` to document the stricter empty-list
   behavior, revised examples, and robust explanations.
+
+---
 
 # [5.4.0] - 2025-08-23
 
@@ -68,6 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Miscellaneous small refactors, test updates, and README polish.
 
+---
+
 # [5.3.0] - 2025-08-12
 
 ### Added
@@ -75,6 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Data Structure: `PriorityQueue` (max-heap by default, supports numbers and custom objects with priorities)
 - Documentation: `docs/priority-queue.md` with comprehensive explanations, examples, and full API reference
 - Updated `README.md` to include PriorityQueue, improved SEO, and added quick usage examples for all data structures
+
+---
 
 # [5.2.0] - 2025-08-12
 
