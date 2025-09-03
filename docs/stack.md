@@ -1,250 +1,448 @@
 # Stack
 
-A classic, robust and developer-friendly **Stack** (LIFO) data structure implemented in TypeScript using a **doubly linked list** internally. Designed for flexibility, extensibility, and performance with support for `emplace`, `clone`, STL-style iterators, and more.
+This document explains what a Stack is, why and when you would use one,
+how the `Stack` in this repository is implemented, and how to use its
+public API. It includes detailed examples, edge cases to watch for, and
+an API reference table for quick lookup. The goal is to be clear for
+beginners while also useful for experienced developers.
 
 ---
 
-## 🚀 Quick Start
+## 1) What is a Stack?
+
+A stack is a simple data structure that follows LIFO (Last-In, First-Out).
+Items are pushed onto the top and popped from the top. The most recently
+pushed item is the first to be removed.
+
+Real-life examples:
+
+- A stack of plates—add to the top, remove from the top.
+- Call stack in programming languages (last called function returns first).
+- Undo stacks in editors (most recent change undone first).
+
+Why use a Stack?
+
+- You need LIFO semantics for algorithms (DFS, expression evaluation,
+  backtracking).
+- You want O(1) push/pop operations and simple, predictable behaviour.
+
+When not to use it:
+
+- If you need FIFO behaviour, prefer `Queue` or `Deque`.
+- If you need random access by index, prefer `Vector` or array.
+
+---
+
+## 2) How this `Stack` is implemented
+
+File: `src/structures/stack.ts`
+
+Key implementation details:
+
+- The `Stack` is backed by a doubly-linked list using `ListNode` nodes.
+  This gives O(1) push/pop at the top and stable node references.
+- The class keeps private `#head`, `#tail`, and `#length` fields.
+- There is optional `factory` support used by `emplace(...)` to construct
+  elements in-place.
+- The implementation provides both non-throwing and throwing accessors
+  (`top` vs `peek()`) to support different developer ergonomics.
+
+Complexity summary:
+
+- `push`, `pop`, `peek` — O(1)
+- `toArray`, `forEach`, `clear`, `clone` — O(n)
+- `assign` — O(n)
+
+---
+
+## 3) Design choices and special notes
+
+Two small API design decisions were made intentionally and are important
+for users to understand:
+
+1. `top` getter vs `peek()` method
+
+- `top` is a JS-friendly getter that returns the value at the top, or
+  `undefined` when the stack is empty. Use this when you prefer a
+  non-throwing inspection.
+- `peek()` is a method that intentionally throws an `Error` when the
+  stack is empty. This follows a defensive, explicit-failure pattern: if
+  calling `peek()` on an empty stack is likely a bug, failing loudly
+  helps catch it.
+
+Why both?
+
+- JavaScript developers often expect property accessors to return
+  `undefined` when absent and to avoid exceptions.
+- Developers familiar with STL or defensive coding prefer explicit
+  errors to reveal bugs early.
+
+Choose the one that fits your code style. If you want a safe check use
+`top` or `isEmpty()` before `peek()`.
+
+2. `size()` method vs `length` getter
+
+- `size()` mirrors STL naming and may be preferred by developers coming
+  from languages that use `size()` (C++, Java).
+- `length` is the JavaScript-friendly property so array-minded developers
+  can use a familiar name.
+
+Both return the same number and are kept for ergonomics only.
+
+---
+
+## 4) Public API — detailed explanations with examples
+
+Each public method and important behaviour is explained with complexity,
+edge cases, and examples.
+
+### Constructor
+
+Signature:
+
+- `new Stack<T, A extends unknown[] = unknown[]>({ initValues?, factory? } = {})`
+
+What it does:
+
+- Create a new `Stack`. Optionally initialize with `initValues` (an
+  array) which will be pushed in order (first element becomes bottom).
+  Optionally provide a `factory` used by `emplace(...args)`.
+
+Complexity: O(n) when `initValues` is provided (push each element), O(1)
+otherwise.
+
+Edge cases:
+
+- Passing `initValues` that is not an array throws `TypeError`.
+
+Example:
 
 ```ts
 import { Stack } from 'stl-kit'
 
-const stack = new Stack<number>()
-stack.push(10)
-stack.push(20)
-console.log(stack.pop()) // 20
-```
+const s1 = new Stack<number>()
+const s2 = new Stack({ initValues: [1, 2, 3] })
 
----
-
-## 🏗️ Constructor
-
-```ts
-new Stack<T, A>(options?: {
-  initValues?: T[]
-  factory?: (...args: A) => T
+// Factory example
+class Rect {
+  constructor(
+    public w: number,
+    public h: number,
+  ) {}
+}
+type FactoryArgs = [w: number, h: number]
+const s3 = new Stack<Rect, FactoryArgs>({
+  factory: (w, h) => new Rect(w, h),
 })
+s3.emplace(2, 4) // pushes Rect { w: 2, h: 4 }
 ```
-
-- `initValues`: Optional array of values to prefill the stack.
-- `factory`: Optional factory for use with `emplace()`.
 
 ---
 
-## 📚 Instance Methods
+### Iteration and reversed
 
-### `push(value: T): void`
+- `for (const v of stack)` iterates from bottom (head) to top (tail).
+- `stack.reversed` is a getter that returns an iterator yielding values
+  from top to bottom.
 
-Adds a value to the top of the stack.
+Example:
 
 ```ts
-stack.push(42)
+const s = new Stack({ initValues: [1, 2, 3] })
+for (const v of s) console.log(v) // 1 -> 2 -> 3
+for (const v of s.reversed) console.log(v) // 3 -> 2 -> 1
 ```
 
 ---
 
-### `pop(): T | undefined`
+### push(value)
 
-Removes and returns the top value. Returns `undefined` if empty.
+What it does:
+
+- Push `value` onto the top of the stack.
+
+Complexity: O(1)
+
+Example:
 
 ```ts
-const val = stack.pop()
+const s = new Stack<number>()
+s.push(1)
+s.push(2)
 ```
 
 ---
 
-### `peek(): T | undefined`
+### pop()
 
-Returns the top value without removing it.
+What it does:
+
+- Remove and return the top value from the stack.
+
+Complexity: O(1)
+
+Edge cases:
+
+- `pop()` throws an `Error` when the stack is empty. This avoids silent
+  bugs from invalid pops.
+
+Example:
 
 ```ts
-stack.peek()
+const s = new Stack({ initValues: ['a', 'b'] })
+console.log(s.pop()) // 'b'
+console.log(s.pop()) // 'a'
+console.log(s.pop()) // Error: Cannot perform pop operation on empty stack.
 ```
 
 ---
 
-### `emplace(...args: A): void`
+### emplace(...args)
 
-Constructs and pushes a value using the provided factory.
+What it does:
+
+- Construct a new element using the `factory` provided at construction and
+  push it onto the stack.
+
+Complexity: O(1) plus factory cost.
+
+Edge cases:
+
+- Throws `TypeError` if no `factory` was provided.
+
+Example:
 
 ```ts
-const stack = new Stack<Person, [string, number]>({
-  factory: (name, age) => new Person(name, age),
-})
-stack.emplace('Alice', 30)
+type P = { x: number }
+const s = new Stack({ factory: (n: number) => ({ x: n }) as P })
+s.emplace(10) // pushes { x: 10 }
 ```
 
 ---
 
-### `assign(count: number, value: T): void`
+### peek()
 
-Fills the stack with `count` copies of `value`.
+What it does:
+
+- Return the top value without removing it.
+
+Complexity: O(1)
+
+Edge cases:
+
+- Throws an `Error` when the stack is empty. Prefer `top` if you want a
+  non-throwing inspection.
+
+Example:
 
 ```ts
-stack.assign(3, 99) // [99, 99, 99]
+const s = new Stack({ initValues: [5] })
+console.log(s.peek()) // 5
 ```
 
 ---
 
-### `assign(values: T[], start?: number, end?: number): void`
+### top getter
 
-Fills the stack with a slice of `values`.
+What it does:
+
+- Return the top value or `undefined` when the stack is empty.
+
+Complexity: O(1)
+
+Example:
 
 ```ts
-stack.assign([1, 2, 3, 4], 1, 3) // [2, 3]
+const s = new Stack<number>()
+console.log(s.top) // undefined
+s.push(42)
+console.log(s.top) // 42
 ```
 
 ---
 
-### `clone(deepCloneFn?: (val: T) => T): Stack<T, A>`
+### isEmpty(), size(), length, clear(), toArray()
 
-Returns a deep copy of the stack. Defaults to `structuredClone`.
+- `isEmpty()` — true if the stack has no elements.
+- `size()` — returns the number of elements (STL-style).
+- `length` — getter alias for `size()` (JS-style).
+- `clear()` — remove all elements (O(n) to cleanup nodes).
+- `toArray()` — return a shallow array copy of the stack (bottom -> top).
+
+Example:
 
 ```ts
-const deep = stack.clone()
-const shallow = stack.clone((v) => v)
+const s = new Stack({ initValues: [1, 2, 3] })
+console.log(s.size()) // 3
+console.log(s.length) // 3
+console.log(s.isEmpty()) // false
+console.log(s.toArray()) // [1, 2, 3]
+s.clear()
+console.log([...s]) // []
 ```
 
 ---
 
-### `clear(): void`
+### assign(values|count, ...)
 
-Removes all elements.
+Overloads:
+
+- `assign(values: T[], start?: number, end?: number)` — copy slice of an
+  array into the stack
+- `assign(count: number, value: T)` — fill the stack with `count` copies
+  of `value`
+
+Both clear the stack first.
+
+Example:
 
 ```ts
-stack.clear()
+const s = new Stack<number>()
+s.assign([1, 2, 3, 4])
+s.assign(2, 99) // [99, 99]
 ```
 
 ---
 
-### `toArray(): T[]`
+### forEach(callback, thisArg?)
 
-Returns a shallow copy of the stack as an array.
+What it does:
+
+- Call `callback(value, index, stack)` for each element. If `callback`
+  returns `false`, iteration stops early.
+
+Edge cases:
+
+- Throws `TypeError` when `callback` is not a function.
+
+Example:
 
 ```ts
-const arr = stack.toArray()
+const s = new Stack({ initValues: ['a', 'b', 'c'] })
+s.forEach((v) => console.log(v)) // iterates from bottom to top
 ```
 
 ---
 
-### `forEach(cb, thisArg?)`
+### clone(deepCloneFn?)
 
-Iterates through the stack from bottom to top.
+What it does:
+
+- Return a shallow copy of the stack. By default it uses `structuredClone`
+  if available; otherwise a custom `deepCloneFn` must be provided.
+
+Complexity: O(n)
+
+Example:
 
 ```ts
-stack.forEach((val, i) => console.log(val, i))
+const copy = s.clone()
+// or with custom deep clone
+const copy2 = s.clone((v) => ({ ...v }))
 ```
 
 ---
 
-### `begin(): IterableIterator<T>`
+### Static helpers: equals(stack1, stack2), swap(stack1, stack2)
 
-Returns a forward iterator (default direction).
+- `equals` compares two stacks element-by-element using a comparator
+  function (defaults to `===`). Throws if inputs are not `Stack` instances.
+- `swap` exchanges internal pointers and lengths in O(1) — useful for
+  efficient swaps without copying.
+
+Example:
 
 ```ts
-for (const val of stack.begin()) { ... }
+const a = new Stack({ initValues: [1, 2, 3] })
+const b = new Stack({ initValues: [4, 5, 6] })
+Stack.equals(a, b) // false
+Stack.swap(a, b) // a = [4,5,6], b = [1,2,3]
 ```
 
 ---
 
-### `rbegin(): IterableIterator<T>`
+## 5) Examples and patterns
 
-Returns a reverse iterator (from top to bottom).
+### Basic LIFO usage
 
 ```ts
-for (const val of stack.rbegin()) { ... }
+const s = new Stack<number>({ initValues: [1, 2, 3] })
+console.log(s.pop()) // 3
+console.log(s.pop()) // 2
+console.log(s.pop()) // 1
 ```
 
----
-
-## 🧾 Properties
-
-### `length: number`
-
-Current number of elements in the stack.
-
-### `top: T | undefined`
-
-Getter/setter for the top value.
+### `top` vs `peek` pattern
 
 ```ts
-stack.top = 99
-const val = stack.top
+const s = new Stack<number>()
+console.log(s.top) // undefined (safe, non-throwing)
+try {
+  console.log(s.peek())
+} catch (err) {
+  // peek() throws when empty
+}
 ```
 
----
-
-## 🧰 Static Methods
-
-### `Stack.equals(stack1, stack2, comparator?): boolean`
-
-Checks equality of two stacks. Optionally pass a comparator.
+### Using `clone` for safe mutable operations
 
 ```ts
-Stack.equals(stackA, stackB)
+const s = new Stack({ initValues: [1, 2, 3] })
+const copy = s.clone()
+const items = copy.toArray() // [1, 2, 3]
+Stack.equals(s, copy) // true
 ```
 
 ---
 
-### `Stack.swap(stack1, stack2): void`
+## 6) Edge cases and best practices
 
-Swaps contents of two stacks (must use same factory).
-
-```ts
-Stack.swap(stack1, stack2)
-```
-
----
-
-## ⚠️ Error Handling
-
-- `top = val` throws if stack is empty.
-- `assign()` throws if invalid range or arguments.
-- `clone()` throws if `structuredClone` not available and no fallback provided.
+- Use `isEmpty()` before `pop()` or `peek()` if you want to avoid exceptions.
+- Use `top` when you prefer a non-throwing, idiomatic JS accessor.
+- Use `size()` or `length` interchangeably — both return the same value.
+- When constructing stacks from large arrays, prefer `assign(values)` or
+  the `initValues` constructor option to avoid repeated reallocation costs.
+- `clear()` frees nodes via their `cleanup()` helper; ensure that cleanup
+  side effects (if any) are acceptable.
 
 ---
 
-## 🧠 Performance
+## 7) API Reference Table (quick sight)
 
-| Operation  | Time Complexity |
-| ---------- | --------------- |
-| push / pop | O(1)            |
-| assign     | O(n)            |
-| clone      | O(n)            |
-| toArray    | O(n)            |
-
----
-
-## 💡 Compatibility
-
-- Requires ES2022+ (`#private fields` and optional `structuredClone`)
-- If using in Node.js < 18, provide a polyfill or custom `deepCloneFn`
-
----
-
-## 📘 API Reference
-
-| Method / Property | Signature                                           | Description                          |
-| ----------------- | --------------------------------------------------- | ------------------------------------ |
-| `push`            | `(value: T): void`                                  | Push a value onto the stack          |
-| `pop`             | `(): T \| undefined`                                | Pop the top value from the stack     |
-| `peek`            | `(): T \| undefined`                                | Return the top value without popping |
-| `emplace`         | `(...args: A): void`                                | Push using a factory                 |
-| `assign` (count)  | `(count: number, value: T): void`                   | Fill stack with repeated value       |
-| `assign` (slice)  | `(values: T[], start?: number, end?: number): void` | Fill stack with slice of array       |
-| `clone`           | `(deepCloneFn?): Stack<T, A>`                       | Clone the stack                      |
-| `clear`           | `(): void`                                          | Empty the stack                      |
-| `toArray`         | `(): T[]`                                           | Convert to array                     |
-| `forEach`         | `(cb, thisArg?): void`                              | Loop through elements                |
-| `begin`           | `(): IterableIterator<T>`                           | Forward iterator                     |
-| `rbegin`          | `(): IterableIterator<T>`                           | Reverse iterator                     |
-| `length`          | `number`                                            | Number of elements                   |
-| `top`             | `T \| undefined` (getter/setter)                    | Get/set top value                    |
-| `Stack.equals`    | `(stack1, stack2, comparator?): boolean`            | Compare two stacks                   |
-| `Stack.swap`      | `(stack1, stack2): void`                            | Swap contents of two stacks          |
+| Name        | Signature                            | Description                                   | Complexity   |
+| ----------- | ------------------------------------ | --------------------------------------------- | ------------ |
+| Constructor | `new Stack(options?)`                | Create stack; accepts `initValues`, `factory` | O(n) w/ init |
+| push        | `push(value: T)`                     | Push on top                                   | O(1)         |
+| pop         | `pop(): T`                           | Remove and return top (throws if empty)       | O(1)         |
+| emplace     | `emplace(...args: A)`                | Build using factory and push                  | O(1)+cost    |
+| peek        | `peek(): T`                          | Inspect top (throws if empty)                 | O(1)         |
+| top         | `get top(): T \| undefined`          | Inspect top non-throwing                      | O(1)         |
+| isEmpty     | `isEmpty(): boolean`                 | True when empty                               | O(1)         |
+| clear       | `clear(): void`                      | Remove all elements                           | O(n)         |
+| toArray     | `toArray(): T[]`                     | Array copy (bottom -> top)                    | O(n)         |
+| assign      | `assign(values\|count, ...)`         | Replace contents                              | O(n)         |
+| forEach     | `forEach(callback)`                  | Iterate with early-stop support               | O(n)         |
+| clone       | `clone(deepCloneFn?)`                | Create deep/shallow copy                      | O(n)         |
+| size        | `size(): number`                     | Number of elements                            | O(1)         |
+| length      | `get length(): number`               | Alias for `size()`                            | O(1)         |
+| reversed    | `get reversed(): IterableIterator`   | Reverse iterator (top -> bottom)              | O(n)         |
+| equals      | `static equals(s1, s2, comparator?)` | Compare two stacks                            | O(n)         |
+| swap        | `static swap(s1, s2)`                | O(1) swap internal pointers                   | O(1)         |
 
 ---
 
-## 📎 License & Contributions
+## 8) Notes, limitations and contribution request
 
-This package is open-source under the MIT License. Feel free to submit issues or pull requests on GitHub.
+- This `Stack` focuses on clear semantics and beginner-friendly behaviour.
+- We intentionally expose both non-throwing (`top`) and throwing
+  (`peek`) accessors for ergonomic and defensive styles, respectively.
+- If you discover a bug or have ideas for additional helpers (bounded
+  stacks, peekMany, persistent stacks), please open an issue or submit a
+  pull request with tests and examples.
+
+Thank you for reading — contributions and questions are welcome!
+
+---
+
+_Created from code in `src/structures/stack.ts`. If you update the
+implementation, consider updating this documentation accordingly._
