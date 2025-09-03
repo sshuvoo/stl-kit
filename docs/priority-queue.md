@@ -75,9 +75,10 @@ Main points of this implementation:
 Comparator contract:
 
 - `compareFn(a, b)` must return:
-  - > 0 if `a` has higher priority than `b` (a comes first)
+  - \> 0 if `a` has higher priority than `b` (a comes first)
   - < 0 if `a` has lower priority than `b`
   - 0 if they are equal
+  - return a-b for max-heap, b-a for min-heap (where a & b are numbers, if a & b are complex object, extract numeric value to compare for example return a.value - b.value)
 
 Note: The default comparator only supports numbers. If you store other types (string, objects) and don't provide a comparator, the queue will throw at runtime.
 
@@ -124,13 +125,14 @@ const pq2 = new PriorityQueue<number>({ initValues: [3, 1, 4, 2] })
 const minPQ = new PriorityQueue<number>({ compareFn: (a, b) => b - a })
 
 // with factory for emplace
-interface Area {
+interface Rectangle {
   width: number
   height: number
   area: number
 }
-const pf = new PriorityQueue<Area>({
-  factory: (w: number, h: number) => ({ width: w, height: h, area: w * h }),
+type FactoryArgs = [w: number, h: number]
+const pf = new PriorityQueue<Rectangle, FactoryArgs>({
+  factory: (w, h) => ({ width: w, height: h, area: w * h }),
 })
 pf.emplace(10, 5) // adds { width: 10, height: 5, area: 50 }
 ```
